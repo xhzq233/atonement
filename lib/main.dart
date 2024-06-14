@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'firebase_options.dart';
 
 import 'package:atonement/theme.dart';
@@ -39,15 +38,15 @@ void main() {
 
         // Note: This callback is fired at each app startup and whenever a new
         // token is generated.
-        log(fcmToken.toString());
-        log('aaaaaa');
+        print(fcmToken.toString());
+        print('aaaaaa');
       }).onError((err) {
         // Error getting token.
-        log(err.toString());
+        print(err.toString());
       });
-      log(fcmToken.toString());
+      print(fcmToken.toString());
     } catch (e) {
-      log(e.toString());
+      print(e.toString());
     }
   }();
 }
@@ -174,7 +173,7 @@ class _TextField extends GetView<_TextFieldViewModel> {
         CupertinoButton(
           child: const Text('发布'),
           onPressed: () {
-            log(vm.controller.text);
+            print(vm.controller.text);
           },
         ),
       ],
