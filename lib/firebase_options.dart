@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '80750108764',
     projectId: 'xhzq233-firebase-demo',
     storageBucket: 'xhzq233-firebase-demo.appspot.com',
+    iosClientId: '80750108764-1c9gmj9ds5sp85unruqgrs5j41mqgq7f.apps.googleusercontent.com',
     iosBundleId: 'xyz.xhzq.atonement',
   );
 
@@ -73,6 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '80750108764',
     projectId: 'xhzq233-firebase-demo',
     storageBucket: 'xhzq233-firebase-demo.appspot.com',
+    iosClientId: '80750108764-3ue1o2tjahr6skrs168ltg9mep8ntsqn.apps.googleusercontent.com',
     iosBundleId: 'com.example.atonement',
   );
 
@@ -85,4 +87,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'xhzq233-firebase-demo.appspot.com',
     measurementId: 'G-ERQ16DJSF5',
   );
+
 }

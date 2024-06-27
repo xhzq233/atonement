@@ -15,7 +15,17 @@ firebase.initializeApp({
 // Necessary to receive background messages:
 const messaging = firebase.messaging();
 
-// Optional:
-messaging.onBackgroundMessage((m) => {
-  console.log("onBackgroundMessage", m);
-});
+//// Optional:
+//messaging.onBackgroundMessage((m) => {
+//  console.log("onBackgroundMessage", m);
+//
+//  // Customize notification here
+//    const notificationTitle = 'Background Message Title';
+//    const notificationOptions = {
+//      body: 'Background Message body.',
+//      icon: '/firebase-logo.png'
+//    };
+//
+//    self.registration.showNotification(notificationTitle,
+//      notificationOptions);
+//});
