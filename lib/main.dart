@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -18,6 +19,7 @@ GoogleSignIn _googleSignIn = GoogleSignIn(
   scopes: ['email'],
 );
 final Rx<GoogleSignInAccount?> _currentUser = null.obs;
+final Rx<String?> _fcmToken = null.obs;
 
 Future<void> _new(String content) {
   if (content.isEmpty) {
@@ -51,10 +53,16 @@ Future<void> _handleSignIn() async {
 void main() {
   runApp(const MyApp());
 
-  _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) => _currentUser.value = account);
-  _googleSignIn.signInSilently();
-
   () async {
+    final signedIn = await _googleSignIn.isSignedIn();
+
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) => _currentUser.value = account);
+    if (_googleSignIn.currentUser != null && signedIn) {
+      _currentUser.value = _googleSignIn.currentUser;
+    } else {
+      _googleSignIn.signInSilently();
+    }
+
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
@@ -75,9 +83,18 @@ void main() {
     }
 
     try {
-      final fcmToken = await FirebaseMessaging.instance.getToken(
+      _fcmToken.value = await FirebaseMessaging.instance.getToken(
           vapidKey: "BJOH1yndL3f6ZACCOjd20QpM8SNpSdWDAZMKSsMLWMdnivi_9hBeIgzCkvjWhXSrM76M1B561lZ7dHrcEf1zpig");
-      print(fcmToken.toString());
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      FirebaseMessaging.instance.onTokenRefresh.listen((String token) {
+        print('Token refreshed: $token');
+        _fcmToken.value = token;
+      });
 
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         print("onMessage: $message");
@@ -161,23 +178,22 @@ class _Drawer extends StatelessWidget {
         children: [
           CupertinoListTile.notched(
             title: const Text('Google 登录'),
-            leading: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: CupertinoColors.activeGreen,
-            ),
+            leading: Obx(() => CircleAvatar(
+                  backgroundImage: NetworkImage(_currentUser.value?.photoUrl ?? ''),
+                )),
             additionalInfo: Obx(() => Text(_currentUser.value?.displayName ?? '未登录')),
             trailing: const CupertinoListTileChevron(),
             onTap: _handleSignIn,
           ),
           CupertinoListTile.notched(
+            title: const Text('FCM Token'),
+            leading: const Icon(CupertinoIcons.bell, color: CupertinoColors.systemYellow),
+            trailing: const Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.systemBlue),
+            onTap: () => Clipboard.setData(ClipboardData(text: _fcmToken.value.toString())),
+          ),
+          CupertinoListTile.notched(
             title: const Text('登出'),
-            leading: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: CupertinoColors.systemRed,
-            ),
-            trailing: const Icon(CupertinoIcons.power, color: CupertinoColors.systemRed),
+            leading: const Icon(CupertinoIcons.power, color: CupertinoColors.systemRed),
             onTap: _googleSignIn.signOut,
           ),
         ],
@@ -232,19 +248,26 @@ class _Posts extends StatelessWidget {
         middle: Text('记录'),
       ),
       child: StreamBuilder<QuerySnapshot>(
-        stream: message.snapshots(),
+        stream: message.orderBy('time', descending: true).snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Something went wrong ${snapshot.error}'));
+            return Align(child: Text('Something went wrong ${snapshot.error}'));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CupertinoActivityIndicator();
+            return const Align(
+              child: FractionallySizedBox(
+                widthFactor: 0.1,
+                heightFactor: 0.1,
+                child: FittedBox(child: CupertinoActivityIndicator()),
+              ),
+            );
           }
 
           return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+              print(data);
               return CupertinoListTile(
                 title: Text(data['content']),
                 subtitle: Text(DateTime.fromMillisecondsSinceEpoch(data['time']).toIso8601String()),
