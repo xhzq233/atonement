@@ -20,6 +20,10 @@ GoogleSignIn _googleSignIn = GoogleSignIn(
 final Rx<GoogleSignInAccount?> _currentUser = null.obs;
 
 Future<void> _new(String content) {
+  if (content.isEmpty) {
+    SmartDialog.showToast('Content is empty');
+    return Future.value();
+  }
   // Call the user's CollectionReference to add a new user
   return message.add({
     'content': content,
@@ -74,6 +78,12 @@ void main() {
       final fcmToken = await FirebaseMessaging.instance.getToken(
           vapidKey: "BJOH1yndL3f6ZACCOjd20QpM8SNpSdWDAZMKSsMLWMdnivi_9hBeIgzCkvjWhXSrM76M1B561lZ7dHrcEf1zpig");
       print(fcmToken.toString());
+
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print("onMessage: $message");
+
+        SmartDialog.showToast(message.notification?.title ?? 'New message');
+      });
     } catch (e) {
       print(e.toString());
     }
@@ -167,7 +177,7 @@ class _Drawer extends StatelessWidget {
               height: double.infinity,
               color: CupertinoColors.systemRed,
             ),
-            trailing: const Icon(CupertinoIcons.delete),
+            trailing: const Icon(CupertinoIcons.power),
             onTap: _googleSignIn.signOut,
           ),
         ],
@@ -178,7 +188,6 @@ class _Drawer extends StatelessWidget {
 
 class _TextFieldViewModel extends GetxController {
   final controller = TextEditingController();
-  RxBool isEditing = false.obs;
 }
 
 class _TextField extends GetView<_TextFieldViewModel> {
