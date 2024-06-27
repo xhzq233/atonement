@@ -19,8 +19,8 @@ dependencies:
   google_sign_in: ^6.2.1
   flutter_smart_dialog: ^4.9.7+7
 
-
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^3.0.0
   build_runner: ^2.4.6
 

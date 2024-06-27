@@ -122,7 +122,7 @@ class _Home extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(
-            largeTitle: const Text('New'),
+            largeTitle: const Text('写点什么'),
             trailing: CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () => Get.toNamed('/posts'),
@@ -166,7 +166,7 @@ class _Drawer extends StatelessWidget {
               height: double.infinity,
               color: CupertinoColors.activeGreen,
             ),
-            additionalInfo: Text(_currentUser.value?.displayName ?? '未登录'),
+            additionalInfo: Obx(() => Text(_currentUser.value?.displayName ?? '未登录')),
             trailing: const CupertinoListTileChevron(),
             onTap: _handleSignIn,
           ),
@@ -177,7 +177,7 @@ class _Drawer extends StatelessWidget {
               height: double.infinity,
               color: CupertinoColors.systemRed,
             ),
-            trailing: const Icon(CupertinoIcons.power),
+            trailing: const Icon(CupertinoIcons.power, color: CupertinoColors.systemRed),
             onTap: _googleSignIn.signOut,
           ),
         ],
