@@ -124,7 +124,13 @@ Future<void> _pushToken(String? token) async {
     return Future.value();
   }
   try {
-    final resp = await http.get(Uri.parse('https://at.mar1sa.icu/pushToken?token=$token'));
+    final resp = await http.post(
+      Uri.parse('https://at.mar1sa.icu/pushToken'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{'token': token}),
+    );
 
     print(resp.body);
   } catch (e) {
