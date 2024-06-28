@@ -175,17 +175,16 @@ class _Posts extends StatelessWidget {
           return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-              return CupertinoListTile(
-                title: Text(data['content']),
-                subtitle: Text(DateTime.fromMillisecondsSinceEpoch(data['time']).toIso8601String()),
-                trailing: Text(
-                  data['send'],
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: CupertinoColors.systemGrey,
-                    inherit: false,
-                  ),
-                ),
+              final sender = data['send'];
+              final content = data['content'];
+              final datetime = DateTime.fromMillisecondsSinceEpoch(data['time']);
+              final formattedDate =
+                  '${datetime.year}-${datetime.month}-${datetime.day} ${datetime.hour}:${datetime.minute}:${datetime.second}';
+
+              return ListTile(
+                title: Text(content),
+                subtitle: Text(formattedDate),
+                trailing: Text(sender),
               );
             }).toList(),
           );
