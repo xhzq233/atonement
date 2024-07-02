@@ -1,12 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 import 'package:atonement/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:get/state_manager.dart';
+import 'platform/sign_in_button.dart';
 import 'messaging.dart';
 
 void main() {
@@ -15,13 +16,17 @@ void main() {
   initFirebase();
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
+NavigatorState get navigator => navigatorKey.currentState!;
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return MaterialApp(
       theme: lightThemeData,
       darkTheme: darkThemeData,
       title: 'Atonement',
@@ -31,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/posts': (context) => const _Posts(),
       },
       builder: FlutterSmartDialog.init(),
+      navigatorKey: navigatorKey,
       initialRoute: '/',
     );
   }
@@ -41,7 +47,6 @@ class _Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(_TextFieldViewModel());
     return Scaffold(
       drawer: const _Drawer(),
       body: CustomScrollView(
@@ -50,7 +55,7 @@ class _Home extends StatelessWidget {
             largeTitle: const Text('写点什么'),
             trailing: CupertinoButton(
               padding: EdgeInsets.zero,
-              onPressed: () => Get.toNamed('/posts'),
+              onPressed: () => navigator.pushNamed('/posts'),
               child: const Icon(CupertinoIcons.chat_bubble_2),
             ),
             leading: Builder(
@@ -86,12 +91,13 @@ class _Drawer extends StatelessWidget {
         children: [
           CupertinoListTile.notched(
             title: const Text('Google 登录'),
+            onTap: kIsWeb ? null : handleNoWebSignIn,
             leading: Obx(() => CircleAvatar(
-                  backgroundImage: NetworkImage(currentUser.value?.photoUrl ?? ''),
-                )),
-            additionalInfo: Obx(() => Text(currentUser.value?.displayName ?? '未登录')),
-            trailing: const CupertinoListTileChevron(),
-            onTap: handleSignIn,
+                foregroundImage: NetworkImage(currentUser.value?.photoUrl ?? ''),
+                onForegroundImageError: (exception, stackTrace) {})),
+            trailing: Obx(() => currentUser.value?.displayName == null
+                ? buildSignInButton(onPressed: handleNoWebSignIn)
+                : Text(currentUser.value?.displayName ?? '')),
           ),
           CupertinoListTile.notched(
             title: const Text('FCM Token'),
@@ -110,16 +116,12 @@ class _Drawer extends StatelessWidget {
   }
 }
 
-class _TextFieldViewModel extends GetxController {
-  final controller = TextEditingController();
-}
-
-class _TextField extends GetView<_TextFieldViewModel> {
+class _TextField extends StatelessWidget {
   const _TextField();
 
   @override
   Widget build(BuildContext context) {
-    final vm = Get.find<_TextFieldViewModel>();
+    final controller = TextEditingController();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -128,7 +130,7 @@ class _TextField extends GetView<_TextFieldViewModel> {
           constraints: const BoxConstraints(maxHeight: 300, minHeight: 200),
           child: CupertinoTextField(
             placeholder: "写点什么",
-            controller: vm.controller,
+            controller: controller,
             clearButtonMode: OverlayVisibilityMode.editing,
             textAlignVertical: TextAlignVertical.top,
             keyboardType: TextInputType.multiline,
@@ -137,7 +139,7 @@ class _TextField extends GetView<_TextFieldViewModel> {
         ),
         Obx(
           () => CupertinoButton(
-            onPressed: currentUser.value == null ? null : () => pushMessage(vm.controller.text),
+            onPressed: currentUser.value == null ? null : () => pushMessage(controller.text),
             child: const Text('发布'),
           ),
         ),
@@ -172,11 +174,16 @@ class _Posts extends StatelessWidget {
             );
           }
 
+          // Empty
+          if (snapshot.data!.docs.isEmpty) {
+            return const Align(child: Text('No data'));
+          }
+
           return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-              final sender = data['send'];
-              final content = data['content'];
+              final String sender = data['send'];
+              final String content = data['content'];
               final datetime = DateTime.fromMillisecondsSinceEpoch(data['time']);
               final formattedDate =
                   '${datetime.year}-${datetime.month}-${datetime.day} ${datetime.hour}:${datetime.minute}:${datetime.second}';

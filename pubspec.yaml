@@ -18,6 +18,8 @@ dependencies:
   cloud_firestore: ^5.0.2
   google_sign_in: ^6.2.1
   flutter_smart_dialog: ^4.9.7+7
+  google_sign_in_web: ^0.12.4+1
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

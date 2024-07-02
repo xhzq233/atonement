@@ -7,9 +7,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 
-import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
 import 'firebase_options.dart';
@@ -24,6 +25,7 @@ GoogleSignIn _googleSignIn = GoogleSignIn(
   clientId: '80750108764-kfjd619q2e4cchruateg3uv0j32ncnrc.apps.googleusercontent.com',
   scopes: ['email'],
 );
+
 final Rx<GoogleSignInAccount?> currentUser = null.obs;
 final Rx<String?> fcmToken = null.obs;
 
@@ -34,7 +36,7 @@ void initFirebase() async {
   if (_googleSignIn.currentUser != null && signedIn) {
     handleAccount(_googleSignIn.currentUser);
   } else {
-    _googleSignIn.signInSilently();
+    _googleSignIn.signInSilently(reAuthenticate: true);
   }
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -58,6 +60,11 @@ void initFirebase() async {
   try {
     fcmToken.value = await FirebaseMessaging.instance
         .getToken(vapidKey: "BJOH1yndL3f6ZACCOjd20QpM8SNpSdWDAZMKSsMLWMdnivi_9hBeIgzCkvjWhXSrM76M1B561lZ7dHrcEf1zpig");
+  } catch (e) {
+    print('Failed to get fcm token: $e');
+  }
+
+  try {
     await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
@@ -76,7 +83,7 @@ void initFirebase() async {
 
       if (message.notification != null) {
         print('Message also contained a notification: ${message.notification}');
-        SmartDialog.showToast(message.notification?.title ?? 'New essage');
+        SmartDialog.showToast(message.notification?.title ?? 'New message');
       }
     });
   } catch (e) {
@@ -148,7 +155,7 @@ Future<void> handleSignOut() async {
   }
 }
 
-Future<void> handleSignIn() async {
+Future<void> handleNoWebSignIn() async {
   try {
     await _googleSignIn.signIn();
   } catch (error) {
@@ -162,15 +169,8 @@ void handleAccount(GoogleSignInAccount? account) async {
   if (account == null) return;
   try {
     final GoogleSignInAuthentication signInAuthentication = await account.authentication;
-    print(signInAuthentication.accessToken);
-    // AuthCredential credential = GoogleAuthProvider.credential(
-    //   idToken: signInAuthentication.idToken,
-    //   accessToken: signInAuthentication.accessToken,
-    // );
-    // UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-    // print("user name" + userCredential.user.uid);
-    // this.firebaseUser = userCredential.user;
-    // print("firebaseUser name" + firebaseUser.displayName);
+    print('accessToken: ${signInAuthentication.accessToken}');
+    print('idToken: ${signInAuthentication.idToken}');
   } catch (e) {
     print(e.toString());
     SmartDialog.showToast(e.toString());
