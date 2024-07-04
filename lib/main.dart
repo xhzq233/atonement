@@ -167,8 +167,8 @@ class _Posts extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Align(
               child: FractionallySizedBox(
-                widthFactor: 0.1,
-                heightFactor: 0.1,
+                widthFactor: 0.07,
+                heightFactor: 0.07,
                 child: FittedBox(child: CupertinoActivityIndicator()),
               ),
             );
@@ -179,24 +179,69 @@ class _Posts extends StatelessWidget {
             return const Align(child: Text('No data'));
           }
 
-          return ListView(
-            children: snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-              final String sender = data['send'];
-              final String content = data['content'];
-              final datetime = DateTime.fromMillisecondsSinceEpoch(data['time']);
-              final formattedDate =
-                  '${datetime.year}-${datetime.month}-${datetime.day} ${datetime.hour}:${datetime.minute}:${datetime.second}';
-
-              return ListTile(
-                title: Text(content),
-                subtitle: Text(formattedDate),
-                trailing: Text(sender),
-              );
-            }).toList(),
-          );
+          return _PostList(snapshot: snapshot);
         },
       ),
+    );
+  }
+}
+
+class _PostList extends StatelessWidget {
+  const _PostList({required this.snapshot});
+
+  final AsyncSnapshot<QuerySnapshot> snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: snapshot.data!.docs.map((DocumentSnapshot document) {
+        Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+        final String sender = data['send'];
+        final String content = data['content'];
+        final datetime = DateTime.fromMillisecondsSinceEpoch(data['time']);
+        final String? avatar = data['avatar'];
+        final formattedDate = datetime.toString();
+
+        Widget avatarWidget;
+        if (avatar != null) {
+          avatarWidget = CircleAvatar(
+            backgroundImage: NetworkImage(avatar),
+            onBackgroundImageError: (exception, stackTrace) {},
+          );
+        } else {
+          avatarWidget = const Icon(CupertinoIcons.person);
+        }
+
+        avatarWidget = SizedBox(width: 32, height: 32, child: avatarWidget);
+
+        return Container(
+          padding: const EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: CupertinoColors.systemGrey6,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DefaultTextStyle.merge(
+                style: Theme.of(context).textTheme.titleMedium!,
+                child: Row(
+                  children: [
+                    avatarWidget,
+                    const SizedBox(width: 8),
+                    Text(sender, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const Spacer(),
+                    Text(formattedDate, style: const TextStyle(color: CupertinoColors.systemGrey)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(content),
+            ],
+          ),
+        );
+      }).toList(growable: false),
     );
   }
 }

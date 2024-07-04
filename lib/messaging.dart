@@ -57,6 +57,7 @@ void initFirebase() async {
   print('User granted permission: ${settings.authorizationStatus}');
   SmartDialog.showToast('User granted permission: ${settings.authorizationStatus}');
 
+  fcmToken.listen(_pushToken);
   try {
     fcmToken.value = await FirebaseMessaging.instance
         .getToken(vapidKey: "BJOH1yndL3f6ZACCOjd20QpM8SNpSdWDAZMKSsMLWMdnivi_9hBeIgzCkvjWhXSrM76M1B561lZ7dHrcEf1zpig");
@@ -74,7 +75,6 @@ void initFirebase() async {
     FirebaseMessaging.instance.onTokenRefresh.listen((String token) {
       print('Token refreshed: $token');
       fcmToken.value = token;
-      _pushToken(token);
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -98,10 +98,14 @@ Future<void> pushMessage(String content) async {
     return Future.value();
   }
   try {
+    final time = DateTime.now().millisecondsSinceEpoch;
+    final sender = currentUser.value!.displayName;
+    final avatar = currentUser.value!.photoUrl;
     final DocumentReference doc = await _messageDb.add({
       'content': content,
-      'time': DateTime.now().millisecondsSinceEpoch,
-      'send': currentUser.value!.displayName,
+      'time': time,
+      'send': sender,
+      'avatar': avatar,
       'read': 0,
     });
     print('Message added with ID: ${doc.id}');
@@ -114,8 +118,9 @@ Future<void> pushMessage(String content) async {
       },
       body: jsonEncode(
         <String, dynamic>{
-          'sender': currentUser.value!.displayName,
+          'sender': sender,
           'content': content,
+          'avatar': avatar,
         },
       ),
     );
