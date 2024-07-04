@@ -193,8 +193,10 @@ class _PostList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: snapshot.data!.docs.map((DocumentSnapshot document) {
+    return ListView.builder(
+      itemCount: snapshot.data!.docs.length,
+      itemBuilder: (BuildContext context, int index) {
+        final document = snapshot.data!.docs[index];
         Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
         final String sender = data['send'];
         final String content = data['content'];
@@ -218,7 +220,7 @@ class _PostList extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: CupertinoColors.systemGrey6,
+            color: CupertinoColors.systemGrey6.resolveFrom(context),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -232,16 +234,16 @@ class _PostList extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(sender, style: const TextStyle(fontWeight: FontWeight.bold)),
                     const Spacer(),
-                    Text(formattedDate, style: const TextStyle(color: CupertinoColors.systemGrey)),
+                    Text(formattedDate, style: TextStyle(color: CupertinoColors.systemGrey.resolveFrom(context))),
                   ],
                 ),
               ),
               const SizedBox(height: 8),
-              Text(content),
+              SelectableText(content),
             ],
           ),
         );
-      }).toList(growable: false),
+      },
     );
   }
 }
