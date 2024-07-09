@@ -42,7 +42,7 @@ void _initNotification() async {
   if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
     settings = await FirebaseMessaging.instance.requestPermission(
       alert: true,
-      announcement: false,
+      announcement: true,
       badge: true,
       carPlay: false,
       criticalAlert: false,
@@ -51,8 +51,8 @@ void _initNotification() async {
     );
   }
 
-  print('User granted permission: ${settings.authorizationStatus}');
-  SmartDialog.showToast('User granted permission: ${settings.authorizationStatus}');
+  print('Notification permission: ${settings.authorizationStatus}');
+  SmartDialog.showToast('Notification permission: ${settings.authorizationStatus}');
 
   fcmToken.listen(_pushToken);
   try {

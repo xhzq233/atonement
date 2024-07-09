@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -44,6 +31,19 @@
         navigator.serviceWorker.register("/firebase-messaging-sw.js");
       });
     }
+
+    if (!("Notification" in window)) {
+        // Check if the browser supports notifications
+        alert("This browser does not support desktop notification");
+    } else if (Notification.permission === "granted") {
+    } else if (Notification.permission !== "denied") {
+        alert("Denied notification permission.");
+        Notification.requestPermission().then((permission) => {
+          console.log("Notification permission: " + permission);
+        });
+    }
+    console.log("Notification permission: " + Notification.permission);
+
   </script>
   <!-- ...put the script at the bottom of the enclosing body tags. -->
 </body>
