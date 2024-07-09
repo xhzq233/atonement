@@ -7,42 +7,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:80750108764:android:73a4f196832f9c8a430699",
-        "android_client_info": {
-          "package_name": "com.example.atonement"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "80750108764-ulukue50a72b8gn2cvdesg4noi745cbu.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyC-znm-cZScRI33ASKqfYKysMcqkCyXSWA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "80750108764-agkn86ani23298eg8oahddhlkpd2sciu.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "80750108764-1c9gmj9ds5sp85unruqgrs5j41mqgq7f.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "xyz.xhzq.atonement"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:80750108764:android:610e0ca6fecdc493430699",
         "android_client_info": {
           "package_name": "xyz.xhzq.atonement"

@@ -10,7 +10,6 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 
-// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
 import 'firebase_options.dart';
@@ -21,15 +20,12 @@ CollectionReference<Map<String, dynamic>> _messageDb = _firestore.collection('me
 Stream<QuerySnapshot<Map<String, dynamic>>> get messageSource =>
     _messageDb.orderBy('time', descending: true).snapshots();
 
-GoogleSignIn _googleSignIn = GoogleSignIn(
-  clientId: '80750108764-kfjd619q2e4cchruateg3uv0j32ncnrc.apps.googleusercontent.com',
-  scopes: ['email'],
-);
+GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
 final Rx<GoogleSignInAccount?> currentUser = null.obs;
 final Rx<String?> fcmToken = null.obs;
 
-void initFirebase() async {
+void _signIn() async {
   final signedIn = await _googleSignIn.isSignedIn();
 
   _googleSignIn.onCurrentUserChanged.listen(handleAccount);
@@ -38,8 +34,9 @@ void initFirebase() async {
   } else {
     _googleSignIn.signInSilently(reAuthenticate: true);
   }
+}
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+void _initNotification() async {
   NotificationSettings settings = await FirebaseMessaging.instance.getNotificationSettings();
 
   if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
@@ -90,6 +87,12 @@ void initFirebase() async {
     print(e.toString());
     SmartDialog.showToast(e.toString());
   }
+}
+
+void initFirebase() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  _signIn();
+  _initNotification();
 }
 
 Future<void> pushMessage(String content) async {
