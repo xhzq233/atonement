@@ -101,9 +101,15 @@ class _Drawer extends StatelessWidget {
           ),
           CupertinoListTile.notched(
             title: const Text('FCM Token'),
-            leading: const Icon(CupertinoIcons.bell, color: CupertinoColors.systemYellow),
-            trailing: const Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.systemYellow),
+            leading: const Icon(Icons.key_rounded, color: CupertinoColors.systemIndigo),
+            trailing: const Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.systemIndigo),
             onTap: () => Clipboard.setData(ClipboardData(text: fcmToken.value.toString())),
+          ),
+          const CupertinoListTile.notched(
+            title: Text('初始化通知'),
+            leading: Icon(CupertinoIcons.bell, color: CupertinoColors.systemYellow),
+            trailing: CupertinoListTileChevron(),
+            onTap: initNotification,
           ),
           const CupertinoListTile.notched(
             title: Text('登出'),

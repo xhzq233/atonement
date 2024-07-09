@@ -36,7 +36,7 @@ void _signIn() async {
   }
 }
 
-void _initNotification() async {
+void initNotification() async {
   NotificationSettings settings = await FirebaseMessaging.instance.getNotificationSettings();
 
   if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
@@ -92,7 +92,6 @@ void _initNotification() async {
 void initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   _signIn();
-  _initNotification();
 }
 
 Future<void> pushMessage(String content) async {

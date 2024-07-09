@@ -31,19 +31,6 @@
         navigator.serviceWorker.register("/firebase-messaging-sw.js");
       });
     }
-
-    if (!("Notification" in window)) {
-        // Check if the browser supports notifications
-        alert("This browser does not support desktop notification");
-    } else if (Notification.permission === "granted") {
-    } else if (Notification.permission !== "denied") {
-        alert("Denied notification permission.");
-        Notification.requestPermission().then((permission) => {
-          console.log("Notification permission: " + permission);
-        });
-    }
-    console.log("Notification permission: " + Notification.permission);
-
   </script>
   <!-- ...put the script at the bottom of the enclosing body tags. -->
 </body>
