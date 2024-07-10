@@ -1,3 +1,5 @@
+import 'package:atonement/log.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -7,13 +9,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/state_manager.dart';
+import 'account.dart';
+import 'firebase_options.dart';
 import 'platform/sign_in_button.dart';
 import 'messaging.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 
-  initFirebase();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  initMessaging();
+  initAccount();
+  initLog();
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -97,7 +104,7 @@ class _Drawer extends StatelessWidget {
                 onForegroundImageError: (exception, stackTrace) {})),
             trailing: Obx(() => currentUser.value?.displayName == null
                 ? buildSignInButton(onPressed: handleNoWebSignIn)
-                : Text(currentUser.value?.displayName ?? '')),
+                : Text(displayName)),
           ),
           CupertinoListTile.notched(
             title: const Text('FCM Token'),
