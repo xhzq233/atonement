@@ -195,6 +195,7 @@ Future<void> _pushToken(String? token) async {
         'name': currentUser.value!.displayName,
       }),
     );
+    fireLogI('Token pushed: $token');
   } catch (e) {
     fireLogE(e.toString());
     SmartDialog.showToast(e.toString());
@@ -202,6 +203,8 @@ Future<void> _pushToken(String? token) async {
 }
 
 Future<void> handleSignOut() async {
+  fireLogI('User signed out');
+  _userBox.clear();
   try {
     await _googleSignIn.signOut();
   } catch (error) {
@@ -220,6 +223,7 @@ Future<void> handleNoWebSignIn() async {
 }
 
 void _handleGoogleAccount(GoogleSignInAccount? account) async {
+  fireLogI('Google account changed: $account');
   if (account == null) return;
   String? idToken;
   try {
@@ -245,6 +249,7 @@ void _handleLocalAccount() {
     id: _userBox.get('id') ?? 'Unknown',
     idToken: _userBox.get('idToken'),
   );
+  fireLogI('User signed in ${_userBox.toMap()}');
 }
 
 // It is assumed that all messages contain a data field with the key 'type'
