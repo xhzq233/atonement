@@ -8,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -16,23 +17,71 @@ import 'firebase_options.dart';
 
 FirebaseFirestore _firestore = FirebaseFirestore.instance;
 CollectionReference<Map<String, dynamic>> _messageDb = _firestore.collection('messages');
+CollectionReference<Map<String, dynamic>> _logDb = _firestore.collection('logs');
+
+void fireLogI(String message) {
+  _logDb.add({
+    'message': message,
+    'type': 'Info',
+    'user': currentUser.value?.displayName ?? 'Unknown',
+    'time': DateTime.now().millisecondsSinceEpoch,
+  });
+}
+
+void fireLogE(String message) {
+  _logDb.add({
+    'message': message,
+    'type': 'Error',
+    'user': currentUser.value?.displayName ?? 'Unknown',
+    'time': DateTime.now().millisecondsSinceEpoch,
+  });
+}
 
 Stream<QuerySnapshot<Map<String, dynamic>>> get messageSource =>
     _messageDb.orderBy('time', descending: true).snapshots();
 
 GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
-final Rx<GoogleSignInAccount?> currentUser = null.obs;
-final Rx<String?> fcmToken = null.obs;
+class GoogleSignInAccountStore {
+  final String displayName;
+  final String email;
+  final String photoUrl;
+  final String id;
+  String? idToken;
 
-void _signIn() async {
+  GoogleSignInAccountStore({
+    required this.displayName,
+    required this.email,
+    required this.photoUrl,
+    required this.id,
+    this.idToken,
+  });
+}
+
+final Rx<GoogleSignInAccountStore?> currentUser = null.obs;
+final Rx<String?> fcmToken = null.obs;
+late final Box<String> _userBox;
+
+void initFirebase() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  _userBox = await Hive.openBox<String>('user');
+
+  _signInGoogle();
+}
+
+void _signInGoogle() async {
   final signedIn = await _googleSignIn.isSignedIn();
 
-  _googleSignIn.onCurrentUserChanged.listen(handleAccount);
+  _googleSignIn.onCurrentUserChanged.listen(_handleGoogleAccount);
   if (_googleSignIn.currentUser != null && signedIn) {
-    handleAccount(_googleSignIn.currentUser);
+    _handleGoogleAccount(_googleSignIn.currentUser);
   } else {
-    _googleSignIn.signInSilently(reAuthenticate: true);
+    final localUser = _userBox.containsKey('displayName');
+    if (localUser) {
+      _handleLocalAccount();
+    } else {
+      _googleSignIn.signInSilently(reAuthenticate: true);
+    }
   }
 }
 
@@ -51,7 +100,7 @@ void initNotification() async {
     );
   }
 
-  print('Notification permission: ${settings.authorizationStatus}');
+  fireLogI('Notification permission: ${settings.authorizationStatus}');
   SmartDialog.showToast('Notification permission: ${settings.authorizationStatus}');
 
   fcmToken.listen(_pushToken);
@@ -59,7 +108,7 @@ void initNotification() async {
     fcmToken.value = await FirebaseMessaging.instance
         .getToken(vapidKey: "BJOH1yndL3f6ZACCOjd20QpM8SNpSdWDAZMKSsMLWMdnivi_9hBeIgzCkvjWhXSrM76M1B561lZ7dHrcEf1zpig");
   } catch (e) {
-    print('Failed to get fcm token: $e');
+    fireLogE('Failed to get fcm token: $e');
   }
 
   try {
@@ -70,28 +119,22 @@ void initNotification() async {
     );
 
     FirebaseMessaging.instance.onTokenRefresh.listen((String token) {
-      print('Token refreshed: $token');
+      fireLogI('Token refreshed: $token');
       fcmToken.value = token;
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
+      fireLogI('Got a message whilst in the foreground! Data: ${message.data}');
 
       if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
+        fireLogI('Message also contained a notification: ${message.notification}');
         SmartDialog.showToast(message.notification?.title ?? 'New message');
       }
     });
   } catch (e) {
-    print(e.toString());
+    fireLogE(e.toString());
     SmartDialog.showToast(e.toString());
   }
-}
-
-void initFirebase() async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  _signIn();
 }
 
 Future<void> pushMessage(String content) async {
@@ -110,9 +153,6 @@ Future<void> pushMessage(String content) async {
       'avatar': avatar,
       'read': 0,
     });
-    print('Message added with ID: ${doc.id}');
-    SmartDialog.showToast('Message added');
-
     final resp = await http.post(
       Uri.parse('https://at.mar1sa.icu/push'),
       headers: <String, String>{
@@ -126,9 +166,11 @@ Future<void> pushMessage(String content) async {
         },
       ),
     );
-    print(resp.body);
+
+    fireLogI('Message added with ID: ${doc.id}, response: ${resp.body}');
+    SmartDialog.showToast('Message added');
   } catch (e) {
-    print(e.toString());
+    fireLogE(e.toString());
     SmartDialog.showToast(e.toString());
   }
 }
@@ -137,18 +179,24 @@ Future<void> _pushToken(String? token) async {
   if (token == null) {
     return Future.value();
   }
+  if (currentUser.value == null) {
+    SmartDialog.showToast('User not signed in');
+    fireLogE('User not signed in');
+    return Future.value();
+  }
   try {
-    final resp = await http.post(
+    await http.post(
       Uri.parse('https://at.mar1sa.icu/pushToken'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, dynamic>{'token': token}),
+      body: jsonEncode(<String, dynamic>{
+        'token': token,
+        'name': currentUser.value!.displayName,
+      }),
     );
-
-    print(resp.body);
   } catch (e) {
-    print(e.toString());
+    fireLogE(e.toString());
     SmartDialog.showToast(e.toString());
   }
 }
@@ -157,7 +205,7 @@ Future<void> handleSignOut() async {
   try {
     await _googleSignIn.signOut();
   } catch (error) {
-    print(error);
+    fireLogE(error.toString());
     SmartDialog.showToast(error.toString());
   }
 }
@@ -166,22 +214,37 @@ Future<void> handleNoWebSignIn() async {
   try {
     await _googleSignIn.signIn();
   } catch (error) {
-    print(error);
+    fireLogE(error.toString());
     SmartDialog.showToast(error.toString());
   }
 }
 
-void handleAccount(GoogleSignInAccount? account) async {
-  currentUser.value = account;
+void _handleGoogleAccount(GoogleSignInAccount? account) async {
   if (account == null) return;
+  String? idToken;
   try {
     final GoogleSignInAuthentication signInAuthentication = await account.authentication;
-    print('accessToken: ${signInAuthentication.accessToken}');
-    print('idToken: ${signInAuthentication.idToken}');
+    idToken = signInAuthentication.idToken;
   } catch (e) {
-    print(e.toString());
+    fireLogE(e.toString());
     SmartDialog.showToast(e.toString());
   }
+  _userBox.put('displayName', account.displayName ?? 'Unknown');
+  _userBox.put('email', account.email);
+  _userBox.put('photoUrl', account.photoUrl ?? '');
+  _userBox.put('id', account.id);
+  if (idToken != null) _userBox.put('idToken', idToken);
+  _handleLocalAccount();
+}
+
+void _handleLocalAccount() {
+  currentUser.value = GoogleSignInAccountStore(
+    displayName: _userBox.get('displayName')!,
+    email: _userBox.get('email') ?? 'Unknown',
+    photoUrl: _userBox.get('photoUrl') ?? '',
+    id: _userBox.get('id') ?? 'Unknown',
+    idToken: _userBox.get('idToken'),
+  );
 }
 
 // It is assumed that all messages contain a data field with the key 'type'
