@@ -19,6 +19,8 @@ Stream<QuerySnapshot<Map<String, dynamic>>> get messageSource =>
 
 final RxString fcmToken = 'null'.obs;
 
+final RxBool pushingMessage = false.obs;
+
 void initMessaging() async {
   setupInteractedMessage();
 }
@@ -81,6 +83,7 @@ Future<void> pushMessage(String content) async {
     SmartDialog.showToast('Content is empty');
     return Future.value();
   }
+  pushingMessage.value = true;
   try {
     final time = DateTime.now().millisecondsSinceEpoch;
     final avatar = currentUser.value.photoUrl;
@@ -111,6 +114,7 @@ Future<void> pushMessage(String content) async {
     fireLogE(e.toString());
     SmartDialog.showToast(e.toString());
   }
+  pushingMessage.value = false;
 }
 
 Future<void> _pushToken(String token) async {

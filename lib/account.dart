@@ -15,6 +15,8 @@ late final Box<String> _userBox;
 
 final Rx<LocalAccount> currentUser = LocalAccount.empty.obs;
 
+bool get hasAccount => currentUser.value.id != LocalAccount.empty.id;
+
 String get displayName => currentUser.value.displayName;
 
 void initAccount() async {
@@ -62,8 +64,9 @@ void _signInGoogle() async {
 }
 
 Future<void> handleSignOut() async {
-  fireLogI('User signed out');
+  fireLogI('User $displayName signed out');
   _userBox.clear();
+  currentUser.value = LocalAccount.empty;
   try {
     await _googleSignIn.signOut();
   } catch (error) {
@@ -108,5 +111,5 @@ void _handleLocalAccount() {
     id: _userBox.get('id') ?? 'Unknown',
     idToken: _userBox.get('idToken'),
   );
-  fireLogI('User signed in ${_userBox.toMap()}');
+  fireLogI('User signed in $displayName, email ${currentUser.value.email}');
 }

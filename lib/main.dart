@@ -100,11 +100,9 @@ class _Drawer extends StatelessWidget {
             title: const Text('Google 登录'),
             onTap: kIsWeb ? null : handleNoWebSignIn,
             leading: Obx(() => CircleAvatar(
-                foregroundImage: NetworkImage(currentUser.value?.photoUrl ?? ''),
+                foregroundImage: NetworkImage(currentUser.value.photoUrl),
                 onForegroundImageError: (exception, stackTrace) {})),
-            trailing: Obx(() => currentUser.value?.displayName == null
-                ? buildSignInButton(onPressed: handleNoWebSignIn)
-                : Text(displayName)),
+            trailing: Obx(() => hasAccount ? Text(displayName) : buildSignInButton(onPressed: handleNoWebSignIn)),
           ),
           CupertinoListTile.notched(
             title: const Text('FCM Token'),
@@ -152,7 +150,7 @@ class _TextField extends StatelessWidget {
         ),
         Obx(
           () => CupertinoButton(
-            onPressed: currentUser.value == null ? null : () => pushMessage(controller.text),
+            onPressed: hasAccount && !pushingMessage.value ? () => pushMessage(controller.text) : null,
             child: const Text('发布'),
           ),
         ),
