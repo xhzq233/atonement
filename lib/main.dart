@@ -15,6 +15,14 @@ import 'platform/sign_in_button.dart';
 import 'messaging.dart';
 
 void main() async {
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FlutterError.reportError(FlutterErrorDetails(exception: error, stack: stack));
+    return true;
+  };
+
   runApp(const MyApp());
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -98,11 +106,11 @@ class _Drawer extends StatelessWidget {
         children: [
           CupertinoListTile.notched(
             title: const Text('Google 登录'),
-            onTap: kIsWeb ? null : handleNoWebSignIn,
+            onTap: kIsWeb ? null : handleNoWebGoogleSignIn,
             leading: Obx(() => CircleAvatar(
                 foregroundImage: NetworkImage(currentUser.value.photoUrl),
                 onForegroundImageError: (exception, stackTrace) {})),
-            trailing: Obx(() => hasAccount ? Text(displayName) : buildSignInButton(onPressed: handleNoWebSignIn)),
+            trailing: Obx(() => hasAccount ? Text(displayName) : buildSignInButton(onPressed: handleNoWebGoogleSignIn)),
           ),
           CupertinoListTile.notched(
             title: const Text('FCM Token'),

@@ -5,77 +5,63 @@ library;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'log.dart';
 
-GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
-
-late final Box<String> _userBox;
+GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
+  'email',
+  // 'https://www.googleapis.com/auth/cloud-platform',
+]);
 
 final Rx<LocalAccount> currentUser = LocalAccount.empty.obs;
 
-bool get hasAccount => currentUser.value.id != LocalAccount.empty.id;
+bool get hasAccount => currentUser.value != LocalAccount.empty;
 
 String get displayName => currentUser.value.displayName;
 
 void initAccount() async {
-  _userBox = await Hive.openBox<String>('user');
-  _signInGoogle();
+  FirebaseAuth.instance.authStateChanges().listen(_handleLocalAccount);
+
+  _googleSignIn.onCurrentUserChanged.listen(_handleGoogleAccount);
 }
 
 class LocalAccount {
   final String displayName;
   final String email;
   final String photoUrl;
+  final String phoneNumber;
   final String id;
-  String? idToken;
+  final List<UserInfo> providers;
 
-  static final LocalAccount empty = LocalAccount(
+  static const LocalAccount empty = LocalAccount(
     displayName: 'Unknown',
     email: 'Unknown',
     photoUrl: '',
     id: 'Unknown',
+    phoneNumber: 'Unknown',
+    providers: [],
   );
 
-  LocalAccount({
+  const LocalAccount({
     required this.displayName,
     required this.email,
     required this.photoUrl,
+    required this.phoneNumber,
     required this.id,
-    this.idToken,
+    required this.providers,
   });
 }
 
-void _signInGoogle() async {
-  final signedIn = await _googleSignIn.isSignedIn();
-
-  _googleSignIn.onCurrentUserChanged.listen(_handleGoogleAccount);
-  if (_googleSignIn.currentUser != null && signedIn) {
-    _handleGoogleAccount(_googleSignIn.currentUser);
-  } else {
-    final localUser = _userBox.containsKey('displayName');
-    if (localUser) {
-      _handleLocalAccount();
-    } else {
-      _googleSignIn.signInSilently(reAuthenticate: true);
-    }
-  }
-}
-
 Future<void> handleSignOut() async {
-  fireLogI('User $displayName signed out');
-  _userBox.clear();
-  currentUser.value = LocalAccount.empty;
   try {
-    await _googleSignIn.signOut();
+    await FirebaseAuth.instance.signOut();
   } catch (error) {
     fireLogE(error.toString());
     SmartDialog.showToast(error.toString());
   }
 }
 
-Future<void> handleNoWebSignIn() async {
+Future<void> handleNoWebGoogleSignIn() async {
   try {
     await _googleSignIn.signIn();
   } catch (error) {
@@ -87,29 +73,39 @@ Future<void> handleNoWebSignIn() async {
 void _handleGoogleAccount(GoogleSignInAccount? account) async {
   fireLogI('Google account changed: $account');
   if (account == null) return;
-  String? idToken;
   try {
     final GoogleSignInAuthentication signInAuthentication = await account.authentication;
-    idToken = signInAuthentication.idToken;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: signInAuthentication.accessToken,
+      idToken: signInAuthentication.idToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
   } catch (e) {
     fireLogE(e.toString());
     SmartDialog.showToast(e.toString());
   }
-  _userBox.put('displayName', account.displayName ?? 'Unknown');
-  _userBox.put('email', account.email);
-  _userBox.put('photoUrl', account.photoUrl ?? '');
-  _userBox.put('id', account.id);
-  if (idToken != null) _userBox.put('idToken', idToken);
-  _handleLocalAccount();
 }
 
-void _handleLocalAccount() {
+void _handleLocalAccount(User? user) {
+  if (user == null) {
+    if (currentUser.value == LocalAccount.empty) {
+      fireLogI('User not signed in, trying to sign in silently...');
+      _googleSignIn.signInSilently(reAuthenticate: true);
+    } else {
+      fireLogI('User $displayName signed out');
+      currentUser.value = LocalAccount.empty;
+    }
+    return;
+  }
   currentUser.value = LocalAccount(
-    displayName: _userBox.get('displayName') ?? 'Unknown',
-    email: _userBox.get('email') ?? 'Unknown',
-    photoUrl: _userBox.get('photoUrl') ?? '',
-    id: _userBox.get('id') ?? 'Unknown',
-    idToken: _userBox.get('idToken'),
+    displayName: user.displayName ?? 'Unknown',
+    email: user.email ?? 'Unknown',
+    photoUrl: user.photoURL ?? '',
+    id: user.uid,
+    phoneNumber: user.phoneNumber ?? 'Unknown',
+    providers: user.providerData,
   );
   fireLogI('User signed in $displayName, email ${currentUser.value.email}');
 }
