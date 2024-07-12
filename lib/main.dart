@@ -1,3 +1,4 @@
+import 'package:atonement/image.dart';
 import 'package:atonement/log.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -17,6 +18,7 @@ import 'messaging.dart';
 void main() async {
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
+    fireLogE(details.exception.toString());
   };
   PlatformDispatcher.instance.onError = (error, stack) {
     FlutterError.reportError(FlutterErrorDetails(exception: error, stack: stack));
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SmartDialog.config.toast = SmartConfigToast(displayTime: const Duration(milliseconds: 2500));
     return MaterialApp(
       theme: lightThemeData,
       darkTheme: darkThemeData,
@@ -85,7 +88,7 @@ class _Home extends StatelessWidget {
             child: Align(
               child: FractionallySizedBox(
                 widthFactor: 0.8,
-                child: _TextField(),
+                child: PickedImage(child: _TextField()),
               ),
             ),
           ),
@@ -156,11 +159,23 @@ class _TextField extends StatelessWidget {
             maxLines: null,
           ),
         ),
-        Obx(
-          () => CupertinoButton(
-            onPressed: hasAccount && !pushingMessage.value ? () => pushMessage(controller.text) : null,
-            child: const Text('发布'),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const PickImageWidget(),
+            Obx(
+              () => CupertinoButton(
+                onPressed: hasAccount && !pushingMessage.value
+                    ? () => pushMessage(
+                          controller.text,
+                          imageUrl: PickedImage.of(context)?.imageUrl,
+                        )
+                    : null,
+                child: const Icon(CupertinoIcons.paperplane),
+              ),
+            ),
+          ],
         ),
       ],
     );

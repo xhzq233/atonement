@@ -78,7 +78,7 @@ void initNotification() async {
   }
 }
 
-Future<void> pushMessage(String content) async {
+Future<void> pushMessage(String content, {String? imageUrl}) async {
   if (content.isEmpty) {
     SmartDialog.showToast('Content is empty');
     return Future.value();
@@ -93,6 +93,7 @@ Future<void> pushMessage(String content) async {
       'send': displayName,
       'avatar': avatar,
       'read': 0,
+      'imageUrl': imageUrl,
     });
     final resp = await http.post(
       Uri.parse('https://at.mar1sa.icu/push'),
