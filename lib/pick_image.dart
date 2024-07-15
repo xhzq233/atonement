@@ -88,7 +88,16 @@ class _PickImageWidgetState extends State<PickImageWidget> {
     if (url == null || url.isEmpty) {
       return const Icon(CupertinoIcons.exclamationmark_circle);
     }
-    return Image.network(url);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: CupertinoColors.systemGrey.resolveFrom(context), width: 1),
+      ),
+      child: Image(
+        image: ResizeImage(NetworkImage(url), width: 100, height: 100),
+        fit: BoxFit.contain,
+      ),
+    );
   }
 
   @override

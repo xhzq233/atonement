@@ -10,5 +10,3 @@ firebase.initializeApp({
   appId: "1:80750108764:web:93bbb279b8bff342430699",
   measurementId: "G-ZNR9T05ENR"
 });
-// Necessary to receive background messages:
-const messaging = firebase.messaging();
