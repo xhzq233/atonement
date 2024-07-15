@@ -10,52 +10,59 @@ class PickedImage extends StatefulWidget {
 
   final Widget? child;
 
-  static PickedImageState? of(BuildContext context) {
-    return context.findAncestorStateOfType<PickedImageState>();
+  static PickedImageState read(BuildContext context) {
+    final PickedImageState? state = context.findAncestorStateOfType<PickedImageState>();
+    if (state == null) {
+      assert(false, 'PickedImage.read(context) called with a context that does not contain a PickedImage.');
+    }
+    return state!;
+  }
+
+  static PickedImageState watch(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_PickedImageState>()!.state;
   }
 
   @override
   State<PickedImage> createState() => PickedImageState();
 }
 
-class PickedImageState extends State<PickedImage> {
+class PickedImageState extends State<PickedImage> with ChangeNotifier {
   String? imageUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.child ?? const SizedBox();
-  }
-}
-
-class PickImageWidget extends StatefulWidget {
-  const PickImageWidget({super.key});
-
-  @override
-  State<PickImageWidget> createState() => _PickImageWidgetState();
-}
-
-enum PickImageState {
-  none,
-  loading,
-  done,
-  error,
-}
-
-class _PickImageWidgetState extends State<PickImageWidget> {
   PickImageState loading = PickImageState.none;
 
-  void _setState(PickImageState state, {String? url}) {
+  void setPickImageState(PickImageState state, {String? url}) {
     if (state == loading) {
       return;
     }
-    setState(() {
-      loading = state;
-      PickedImage.of(context)?.imageUrl = url;
-    });
+    loading = state;
+    imageUrl = url;
+    setState(() {});
   }
 
-  Future<void> _pickImage() async {
-    _setState(PickImageState.loading);
+  @override
+  Widget build(BuildContext context) {
+    return _PickedImageState(imageUrl, loading, state: this, child: widget.child ?? const SizedBox());
+  }
+}
+
+class _PickedImageState extends InheritedWidget {
+  const _PickedImageState(this.imageUrl, this.loading, {required super.child, required this.state});
+
+  final PickedImageState state;
+  final String? imageUrl;
+  final PickImageState loading;
+
+  @override
+  bool updateShouldNotify(covariant _PickedImageState oldWidget) {
+    return oldWidget.imageUrl != imageUrl || oldWidget.loading != loading;
+  }
+}
+
+class PickImageWidget extends StatelessWidget {
+  const PickImageWidget({super.key});
+
+  Future<void> _pickImage(context) async {
+    PickedImage.read(context).setPickImageState(PickImageState.loading);
     try {
       final FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -69,7 +76,7 @@ class _PickImageWidgetState extends State<PickImageWidget> {
 
           await ref.putData(bytes!, SettableMetadata(contentType: 'image/jpeg'));
           final url = await ref.getDownloadURL();
-          _setState(PickImageState.done, url: url);
+          PickedImage.read(context).setPickImageState(PickImageState.done, url: url);
         } else {
           throw "Platform not supported";
         }
@@ -77,25 +84,26 @@ class _PickImageWidgetState extends State<PickImageWidget> {
         throw "User canceled the picker";
       }
     } catch (e) {
-      _setState(PickImageState.error);
+      PickedImage.read(context).setPickImageState(PickImageState.error);
       fireLogE(e.toString());
       SmartDialog.showToast(e.toString());
     }
   }
 
-  Widget _getImage() {
-    final String? url = PickedImage.of(context)?.imageUrl;
+  Widget _getImage(BuildContext context) {
+    final String? url = PickedImage.read(context).imageUrl;
     if (url == null || url.isEmpty) {
       return const Icon(CupertinoIcons.exclamationmark_circle);
     }
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: CupertinoColors.systemGrey.resolveFrom(context), width: 1),
-      ),
-      child: Image(
-        image: ResizeImage(NetworkImage(url), width: 100, height: 100),
-        fit: BoxFit.contain,
+    return SizedBox(
+      width: 100,
+      height: 100,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: CupertinoColors.systemGrey.resolveFrom(context), width: 1),
+          image: DecorationImage(image: ResizeImage(NetworkImage(url), width: 100, height: 100), fit: BoxFit.contain),
+        ),
       ),
     );
   }
@@ -104,23 +112,29 @@ class _PickImageWidgetState extends State<PickImageWidget> {
   Widget build(BuildContext context) {
     Widget widget;
 
+    final loading = PickedImage.watch(context).loading;
+
     widget = switch (loading) {
       PickImageState.loading => const CupertinoActivityIndicator(),
-      PickImageState.done => ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 100, minHeight: 100),
-          child: _getImage(),
-        ),
+      PickImageState.done => _getImage(context),
       PickImageState.error => const Icon(CupertinoIcons.refresh_thick),
       PickImageState.none => const Icon(CupertinoIcons.photo_on_rectangle),
     };
 
     VoidCallback? function;
     if (loading == PickImageState.error || loading == PickImageState.none) {
-      function = _pickImage;
+      function = () => _pickImage(context);
     }
 
     widget = CupertinoButton(onPressed: function, child: widget);
 
     return widget;
   }
+}
+
+enum PickImageState {
+  none,
+  loading,
+  done,
+  error,
 }
