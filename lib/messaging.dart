@@ -80,7 +80,7 @@ void initNotification() async {
 
 Future<void> pushMessage(String content, {String? imageUrl}) async {
   if (content.isEmpty) {
-    SmartDialog.showToast('Content is empty');
+    SmartDialog.showToast('内容为空');
     return Future.value();
   }
   pushingMessage.value = true;

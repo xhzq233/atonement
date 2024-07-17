@@ -132,12 +132,12 @@ class _TextField extends StatelessWidget {
               () => CupertinoButton(
                 onPressed: hasAccount && !pushingMessage.value
                     ? () {
-                        controller.clear();
-                        PickedImage.read(context).setPickImageState(PickImageState.none);
                         pushMessage(
                           controller.text,
                           imageUrl: PickedImage.read(context).imageUrl,
                         );
+                        controller.clear();
+                        PickedImage.read(context).setPickImageState(PickImageState.none);
                       }
                     : null,
                 child: const Icon(CupertinoIcons.paperplane),
