@@ -11,7 +11,10 @@ class _Drawer extends StatelessWidget {
     return Drawer(
       child: CupertinoListSection.insetGrouped(
         backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
-        header: const Text('信息'),
+        header: Padding(
+          padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+          child: const Text('信息'),
+        ),
         children: [
           CupertinoListTile.notched(
             title: const Text('Google 登录'),
@@ -39,7 +42,6 @@ class _Drawer extends StatelessWidget {
             onTap: handleSignOut,
           ),
           // Switcher
-
         ],
       ),
     );
