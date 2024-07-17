@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/state_manager.dart';
 import 'account.dart';
-import 'disable_backswipe.dart';
 import 'firebase_options.dart';
 import 'platform/sign_in_button.dart';
 import 'messaging.dart';
@@ -54,8 +53,8 @@ class MyApp extends StatelessWidget {
       title: 'Atonement',
       scrollBehavior: const CupertinoScrollBehavior(),
       routes: {
-        '/': (context) => const DisableBackSwipe(child: _Home()),
-        '/posts': (context) => const DisableBackSwipe(child: _Posts()),
+        '/': (context) => const _Home(),
+        '/posts': (context) => const _Posts(),
       },
       builder: FlutterSmartDialog.init(builder: (context, child) => child!),
       navigatorKey: navigatorKey,
