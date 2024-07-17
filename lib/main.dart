@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const _Home(),
         '/posts': (context) => const _Posts(),
       },
-      builder: FlutterSmartDialog.init(builder: (context, child) => child!),
+      builder: FlutterSmartDialog.init(),
       navigatorKey: navigatorKey,
       initialRoute: '/',
     );
