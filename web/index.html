@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <style>
+    html, body {
+      overscroll-behavior-x: none;
+    }
+  </style>
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -24,7 +29,6 @@
 <body>
   <script src="flutter_bootstrap.js" async></script>
 
-  <!-- ...other html setup. -->
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
@@ -32,6 +36,5 @@
       });
     }
   </script>
-  <!-- ...put the script at the bottom of the enclosing body tags. -->
 </body>
 </html>
