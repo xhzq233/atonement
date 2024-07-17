@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/state_manager.dart';
 import 'account.dart';
+import 'disable_backswipe.dart';
 import 'firebase_options.dart';
 import 'platform/sign_in_button.dart';
 import 'messaging.dart';
@@ -31,9 +32,9 @@ void main() async {
   runApp(const MyApp());
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await initLog();
   initMessaging();
   initAccount();
-  initLog();
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -53,11 +54,10 @@ class MyApp extends StatelessWidget {
       title: 'Atonement',
       scrollBehavior: const CupertinoScrollBehavior(),
       routes: {
-        '/': (context) => const _Home(),
-        '/posts': (context) => const _Posts(),
-        '/image': (context) => ImageDetail(imageUrl: ModalRoute.of(context)!.settings.arguments as String),
+        '/': (context) => const DisableBackSwipe(child: _Home()),
+        '/posts': (context) => const DisableBackSwipe(child: _Posts()),
       },
-      builder: FlutterSmartDialog.init(),
+      builder: FlutterSmartDialog.init(builder: (context, child) => child!),
       navigatorKey: navigatorKey,
       initialRoute: '/',
     );

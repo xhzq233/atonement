@@ -37,7 +37,10 @@ class Bubble extends StatelessWidget {
           Dominant(child: Padding(padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4), child: body)),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: () => navigator.pushNamed('/image', arguments: imageUrl),
+            onPressed: () => navigator.push(CupertinoPageRoute(
+              builder: (context) => ImageDetail(imageUrl: imageUrl),
+              fullscreenDialog: true,
+            )),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Hero(tag: imageUrl, child: Image.network(imageUrl, fit: BoxFit.contain)),

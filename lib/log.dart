@@ -2,6 +2,7 @@
 /// Created by xhz on 7/10/24
 library;
 
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,7 +16,7 @@ late final Map<String, dynamic> deviceInfo;
 late final String device;
 CollectionReference<Map<String, dynamic>> _logDb = FirebaseFirestore.instance.collection('logs');
 
-void initLog() async {
+Future<void> initLog() async {
   deviceInfo = (await deviceInfoPlugin.deviceInfo).data;
   if (kIsWeb) {
     device = deviceInfo['platform'].toString();
@@ -33,12 +34,14 @@ void fireLogE(String message) {
 }
 
 void _log(String message, String type) {
-  _logDb.add({
-    'message': message,
-    'type': type,
-    'user': displayName,
-    'time': DateTime.now().millisecondsSinceEpoch,
-    'device': device,
-  });
+  if (hasAccount) {
+    _logDb.add({
+      'message': message,
+      'type': type,
+      'user': displayName,
+      'time': DateTime.now().millisecondsSinceEpoch,
+      'device': device,
+    });
+  }
   log('$type: $message');
 }
