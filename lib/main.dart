@@ -16,6 +16,8 @@ import 'firebase_options.dart';
 import 'platform/sign_in_button.dart';
 import 'messaging.dart';
 
+part 'drawer.dart';
+
 void main() async {
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
@@ -78,6 +80,7 @@ class _Home extends StatelessWidget {
               onPressed: () => navigator.pushNamed('/posts'),
               child: const Icon(CupertinoIcons.chat_bubble_2),
             ),
+            backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
             leading: Builder(
                 builder: (context) => CupertinoButton(
                       padding: EdgeInsets.zero,
@@ -93,46 +96,6 @@ class _Home extends StatelessWidget {
                 child: PickedImage(child: _TextField()),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Drawer extends StatelessWidget {
-  const _Drawer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: CupertinoListSection.insetGrouped(
-        header: const Text('信息'),
-        children: [
-          CupertinoListTile.notched(
-            title: const Text('Google 登录'),
-            onTap: kIsWeb ? null : handleNoWebGoogleSignIn,
-            leading: Obx(() => CircleAvatar(
-                foregroundImage: NetworkImage(currentUser.value.photoUrl),
-                onForegroundImageError: (exception, stackTrace) {})),
-            trailing: Obx(() => hasAccount ? Text(displayName) : buildSignInButton(onPressed: handleNoWebGoogleSignIn)),
-          ),
-          CupertinoListTile.notched(
-            title: const Text('FCM Token'),
-            leading: const Icon(Icons.key_rounded, color: CupertinoColors.systemIndigo),
-            trailing: const Icon(CupertinoIcons.doc_on_doc, color: CupertinoColors.systemIndigo),
-            onTap: () => Clipboard.setData(ClipboardData(text: fcmToken.value.toString())),
-          ),
-          const CupertinoListTile.notched(
-            title: Text('初始化通知'),
-            leading: Icon(CupertinoIcons.bell, color: CupertinoColors.systemYellow),
-            trailing: CupertinoListTileChevron(),
-            onTap: initNotification,
-          ),
-          const CupertinoListTile.notched(
-            title: Text('登出'),
-            leading: Icon(CupertinoIcons.power, color: CupertinoColors.systemRed),
-            onTap: handleSignOut,
           ),
         ],
       ),
@@ -194,9 +157,7 @@ class _Posts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('记录'),
-      ),
+      navigationBar: const CupertinoNavigationBar(middle: Text('记录')),
       child: StreamBuilder(
         stream: messageSource,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
