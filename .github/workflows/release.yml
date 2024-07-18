@@ -177,7 +177,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: "stable"
           cache: true
           cache-key: ${{ env.CACHE_KEY }}
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
@@ -186,13 +185,13 @@ jobs:
         run: flutter build windows
 
       - name: Zip compiled files
-        run: Compress-Archive -Path build/windows/runner/Release/* -DestinationPath ${{ env.APP_NAME }}.zip
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath App.zip
 
       - name: Upload zip
         uses: actions/upload-artifact@v3
         with:
           name: windows-zip-result
-          path: ${{ env.APP_NAME }}.zip
+          path: App.zip
 
   release:
     needs: [ build, build_apk, build_windows_zip, build_ipa, build_macos ]
@@ -237,7 +236,7 @@ jobs:
           name: windows-zip-result
           path: windows-zip-result
       - name: Rename windows
-        run: mv windows-zip-result/*.zip windows-zip-result/${{ env.APP_NAME }}-${{ env.VERSION }}-windows-x86-64.zip
+        run: mv windows-zip-result/*.zip windows-zip-result/${{ env.APP_NAME }}-${{ env.VERSION }}-windows-x64.zip
 
       - name: Push to Release
         uses: ncipollo/release-action@v1
