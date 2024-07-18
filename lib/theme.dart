@@ -1,8 +1,33 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-final _lightScheme = ColorScheme.fromSeed(seedColor: Colors.lightGreen);
-final _darkScheme = ColorScheme.fromSeed(seedColor: Colors.lightGreen, brightness: Brightness.dark);
+final seedColors = [
+  Colors.lightGreen,
+  Colors.purple,
+  Colors.orange,
+  Colors.blue,
+  Colors.red,
+  Colors.teal,
+  Colors.pink,
+  Colors.indigo,
+  Colors.amber,
+  Colors.cyan,
+  Colors.deepOrange,
+  Colors.deepPurple,
+  Colors.green,
+  Colors.lime,
+  Colors.yellow,
+  Colors.brown,
+  Colors.grey,
+  Colors.blueGrey,
+];
+
+final randomSeedColor = seedColors[Random().nextInt(seedColors.length)];
+
+final _lightScheme = ColorScheme.fromSeed(seedColor: randomSeedColor);
+final _darkScheme = ColorScheme.fromSeed(seedColor: randomSeedColor, brightness: Brightness.dark);
 
 final lightThemeData = ThemeData(
   colorScheme: _lightScheme,
