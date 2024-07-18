@@ -1,8 +1,11 @@
 import 'package:atonement/main.dart';
-import 'package:atonement/platform/download_file.dart';
 import 'package:boxy/flex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'log.dart';
 
 class Bubble extends StatelessWidget {
   const Bubble({super.key, required this.data});
@@ -94,7 +97,14 @@ class ImageDetail extends StatelessWidget {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           child: const Icon(CupertinoIcons.arrow_down_to_line),
-          onPressed: () => download(url: imageUrl),
+          onPressed: () async {
+            try {
+              launchUrl(Uri.parse(imageUrl));
+            } catch (e) {
+              fireLogE(e.toString());
+              SmartDialog.showToast(e.toString());
+            }
+          },
         ),
       ),
       child: Align(

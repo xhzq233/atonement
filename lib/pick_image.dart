@@ -2,8 +2,9 @@ import 'package:atonement/log.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
+import 'platform/upload_image.dart';
 
 class PickedImage extends StatefulWidget {
   const PickedImage({super.key, this.child});
@@ -69,19 +70,10 @@ class PickImageWidget extends StatelessWidget {
         allowedExtensions: ['jpg', 'png', 'jpeg', 'gif'],
       );
       if (result != null && result.files.isNotEmpty) {
-        if (kIsWeb) {
-          final bytes = result.files.single.bytes;
-          final filename = result.files.single.name;
-          final ref = FirebaseStorage.instance.ref('images/$filename');
-
-          await ref.putData(bytes!, SettableMetadata(contentType: 'image/jpeg'));
-          final url = await ref.getDownloadURL();
-          PickedImage.read(context).setPickImageState(PickImageState.done, url: url);
-        } else {
-          throw "Platform not supported";
-        }
+        final url = await uploadImage(file: result.files.single);
+        PickedImage.read(context).setPickImageState(PickImageState.done, url: url);
       } else {
-        throw "User canceled the picker";
+        // throw "User canceled the picker";
       }
     } catch (e) {
       PickedImage.read(context).setPickImageState(PickImageState.error);
@@ -117,8 +109,7 @@ class PickImageWidget extends StatelessWidget {
     widget = switch (loading) {
       PickImageState.loading => const CupertinoActivityIndicator(),
       PickImageState.done => _getImage(context),
-      PickImageState.error => const Icon(CupertinoIcons.refresh_thick),
-      PickImageState.none => const Icon(CupertinoIcons.photo_on_rectangle),
+      PickImageState.none || PickImageState.error => const Icon(CupertinoIcons.photo_on_rectangle),
     };
 
     VoidCallback? function;
