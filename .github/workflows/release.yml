@@ -103,8 +103,11 @@ jobs:
           cache-key: ${{ env.CACHE_KEY }}
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
 
+      - name: Enable macOS
+        run: flutter config --enable-macos-desktop
+
       - name: Build macOS
-        run: flutter build macos
+        run: flutter build macos --release
 
       - name: Upload macOS
         uses: actions/upload-artifact@v3
