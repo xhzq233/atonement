@@ -43,7 +43,8 @@ class _ImageDetail extends StatelessWidget {
           child: const Icon(CupertinoIcons.arrow_down_to_line),
           onPressed: () async {
             try {
-              launchUrl(Uri.parse(imageUrl));
+              await launchUrl(Uri.parse(imageUrl));
+              fireLogI('Downloaded $imageUrl');
             } catch (e) {
               fireLogE(e.toString());
               SmartDialog.showToast(e.toString());

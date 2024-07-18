@@ -1,6 +1,5 @@
 import 'package:atonement/log.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
@@ -71,6 +70,7 @@ class PickImageWidget extends StatelessWidget {
       );
       if (result != null && result.files.isNotEmpty) {
         final url = await uploadImage(file: result.files.single);
+        fireLogI('Uploaded image: $url');
         PickedImage.read(context).setPickImageState(PickImageState.done, url: url);
       } else {
         // throw "User canceled the picker";
