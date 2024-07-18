@@ -1,4 +1,4 @@
-package com.example.atonement
+package xyz.xhzq.atonement
 
 import io.flutter.embedding.android.FlutterActivity
 
