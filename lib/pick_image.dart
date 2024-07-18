@@ -74,6 +74,7 @@ class PickImageWidget extends StatelessWidget {
         PickedImage.read(context).setPickImageState(PickImageState.done, url: url);
       } else {
         // throw "User canceled the picker";
+        PickedImage.read(context).setPickImageState(PickImageState.error);
       }
     } catch (e) {
       PickedImage.read(context).setPickImageState(PickImageState.error);

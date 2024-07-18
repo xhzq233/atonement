@@ -2,10 +2,8 @@ import 'package:atonement/main.dart';
 import 'package:boxy/flex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import 'log.dart';
+import 'image_detail.dart';
 
 class Bubble extends StatelessWidget {
   const Bubble({super.key, required this.data});
@@ -40,10 +38,7 @@ class Bubble extends StatelessWidget {
           Dominant(child: Padding(padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4), child: body)),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: () => navigator.push(CupertinoPageRoute(
-              builder: (context) => ImageDetail(imageUrl: imageUrl),
-              fullscreenDialog: true,
-            )),
+            onPressed: () => navigator.push(ImagePageRoute(imageUrl: imageUrl)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Hero(tag: imageUrl, child: Image.network(imageUrl, fit: BoxFit.contain)),
@@ -78,37 +73,6 @@ class Bubble extends StatelessWidget {
           const SizedBox(height: 8),
           body
         ],
-      ),
-    );
-  }
-}
-
-class ImageDetail extends StatelessWidget {
-  const ImageDetail({super.key, required this.imageUrl});
-
-  final String imageUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text('图片'),
-        // Download
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.arrow_down_to_line),
-          onPressed: () async {
-            try {
-              launchUrl(Uri.parse(imageUrl));
-            } catch (e) {
-              fireLogE(e.toString());
-              SmartDialog.showToast(e.toString());
-            }
-          },
-        ),
-      ),
-      child: Align(
-        child: Hero(tag: imageUrl, child: Image.network(imageUrl)),
       ),
     );
   }
