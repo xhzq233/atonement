@@ -24,7 +24,7 @@ class ImagePageRoute extends PageRoute<void> {
   bool get maintainState => true;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 500);
+  Duration get transitionDuration => const Duration(milliseconds: 300);
 }
 
 class _ImageDetail extends StatelessWidget {
