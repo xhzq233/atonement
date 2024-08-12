@@ -21,7 +21,7 @@ Future<void> initLog() async {
   if (kIsWeb) {
     device = deviceInfo['platform'].toString();
   } else {
-    device = 'NoneWeb';
+    device = deviceInfo.toString();
   }
 }
 
