@@ -11,15 +11,11 @@ class PickedImage extends StatefulWidget {
   final Widget? child;
 
   static PickedImageState read(BuildContext context) {
-    final PickedImageState? state = context.findAncestorStateOfType<PickedImageState>();
-    if (state == null) {
-      assert(false, 'PickedImage.read(context) called with a context that does not contain a PickedImage.');
-    }
-    return state!;
+    return context.getInheritedWidgetOfExactType<_PickedImageState>()!.notifier!;
   }
 
   static PickedImageState watch(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_PickedImageState>()!.state;
+    return context.dependOnInheritedWidgetOfExactType<_PickedImageState>()!.notifier!;
   }
 
   @override
@@ -36,26 +32,17 @@ class PickedImageState extends State<PickedImage> with ChangeNotifier {
     }
     loading = state;
     imageUrl = url;
-    setState(() {});
+    notifyListeners();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _PickedImageState(imageUrl, loading, state: this, child: widget.child ?? const SizedBox());
+    return _PickedImageState(notifier: this, child: widget.child ?? const SizedBox());
   }
 }
 
-class _PickedImageState extends InheritedWidget {
-  const _PickedImageState(this.imageUrl, this.loading, {required super.child, required this.state});
-
-  final PickedImageState state;
-  final String? imageUrl;
-  final PickImageState loading;
-
-  @override
-  bool updateShouldNotify(covariant _PickedImageState oldWidget) {
-    return oldWidget.imageUrl != imageUrl || oldWidget.loading != loading;
-  }
+class _PickedImageState extends InheritedNotifier<PickedImageState> {
+  const _PickedImageState({required super.child, super.notifier});
 }
 
 class PickImageWidget extends StatelessWidget {
