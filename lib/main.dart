@@ -48,8 +48,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SmartDialog.config.toast = SmartConfigToast(displayTime: const Duration(milliseconds: 2500));
-    final brightness = MediaQuery.platformBrightnessOf(context);
-    changePWABarColorTo(brightness == Brightness.dark ? darkThemeData.primaryColor : lightThemeData.primaryColor);
+    if (kIsWeb) {
+      final brightness = MediaQuery.platformBrightnessOf(context);
+      changePWABarColorTo(brightness == Brightness.dark ? darkThemeData.primaryColor : lightThemeData.primaryColor);
+    }
     return MaterialApp(
       theme: lightThemeData,
       darkTheme: darkThemeData,
@@ -77,10 +79,20 @@ class _Home extends StatelessWidget {
         slivers: [
           CupertinoSliverNavigationBar(
             largeTitle: const Text('写点什么'),
-            trailing: CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: () => navigator.pushNamed('/posts'),
-              child: const Icon(CupertinoIcons.chat_bubble_2),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => navigator.pushNamed('/posts'),
+                  child: const Icon(CupertinoIcons.text_badge_checkmark),
+                ),
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => navigator.pushNamed('/posts'),
+                  child: const Icon(CupertinoIcons.chat_bubble_2),
+                ),
+              ],
             ),
             backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
             leading: Builder(

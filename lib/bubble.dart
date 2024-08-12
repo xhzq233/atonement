@@ -1,9 +1,7 @@
-import 'package:atonement/main.dart';
+import 'package:atonement/image.dart';
 import 'package:boxy/flex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'image_detail.dart';
 
 class Bubble extends StatelessWidget {
   const Bubble({super.key, required this.data});
@@ -36,14 +34,7 @@ class Bubble extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Dominant(child: Padding(padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4), child: body)),
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () => navigator.push(ImagePageRoute(imageUrl: imageUrl)),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Hero(tag: imageUrl, child: Image.network(imageUrl, fit: BoxFit.contain)),
-            ),
-          ),
+          WrapImage(imageUrl: imageUrl)
         ],
       );
     }
