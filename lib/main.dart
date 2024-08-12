@@ -1,6 +1,7 @@
 import 'package:atonement/bubble.dart';
 import 'package:atonement/pick_image.dart';
 import 'package:atonement/log.dart';
+import 'package:atonement/platform/change_pwa_bar_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -47,6 +48,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SmartDialog.config.toast = SmartConfigToast(displayTime: const Duration(milliseconds: 2500));
+    final brightness = MediaQuery.platformBrightnessOf(context);
+    changePWABarColorTo(brightness == Brightness.dark ? darkThemeData.primaryColor : lightThemeData.primaryColor);
     return MaterialApp(
       theme: lightThemeData,
       darkTheme: darkThemeData,
