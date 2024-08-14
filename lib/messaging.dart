@@ -12,10 +12,26 @@ import 'package:http/http.dart' as http;
 import 'account.dart';
 import 'log.dart';
 
-CollectionReference<Map<String, dynamic>> _messageDb = FirebaseFirestore.instance.collection('messages');
+final CollectionReference<Map<String, dynamic>> _messageDb = FirebaseFirestore.instance.collection('messages');
 
+final CollectionReference<Map<String, dynamic>> _todoDb = FirebaseFirestore.instance.collection('todos');
+
+// send
+// content
+// time
+// avatar
+// imageUrl
+// read
 Stream<QuerySnapshot<Map<String, dynamic>>> get messageSource =>
     _messageDb.orderBy('time', descending: true).snapshots();
+
+// send
+// content
+// time
+// avatar
+// imageUrl
+// complete
+Stream<QuerySnapshot<Map<String, dynamic>>> get todoSource => _todoDb.orderBy('time', descending: true).snapshots();
 
 final RxString fcmToken = 'null'.obs;
 

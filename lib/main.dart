@@ -60,6 +60,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const _Home(),
         '/posts': (context) => const _Posts(),
+        '/todos': (context) => const _Todos(),
       },
       builder: FlutterSmartDialog.init(),
       navigatorKey: navigatorKey,
@@ -84,7 +85,7 @@ class _Home extends StatelessWidget {
               children: [
                 CupertinoButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () => navigator.pushNamed('/posts'),
+                  onPressed: () => navigator.pushNamed('/todos'),
                   child: const Icon(CupertinoIcons.text_badge_checkmark),
                 ),
                 CupertinoButton(
@@ -172,36 +173,67 @@ class _Posts extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(middle: Text('记录')),
-      child: StreamBuilder(
-        stream: messageSource,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (snapshot.hasError) {
-            return Align(child: Text('Something went wrong ${snapshot.error}'));
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Align(
-              child: FractionallySizedBox(
-                widthFactor: 0.07,
-                heightFactor: 0.07,
-                child: FittedBox(child: CupertinoActivityIndicator()),
-              ),
-            );
-          }
-
-          // Empty
-          if (snapshot.data!.docs.isEmpty || !snapshot.hasData) {
-            return const Align(child: Text('No data'));
-          }
-
-          final data = snapshot.data!;
-
-          return ListView.builder(
-            itemCount: data.docs.length,
-            itemBuilder: (BuildContext context, int index) => Bubble(data: data.docs[index].data()),
-          );
-        },
+      child: _StorageList(
+        source: messageSource,
+        itemBuilder: (BuildContext context, Map<String, dynamic> data) => Bubble(data: data),
       ),
+    );
+  }
+}
+
+class _Todos extends StatelessWidget {
+  const _Todos();
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(middle: Text('愿望清单')),
+      child: _StorageList(
+        source: todoSource,
+        itemBuilder: (BuildContext context, Map<String, dynamic> data) => Bubble(data: data),
+      ),
+    );
+  }
+}
+
+class _StorageList extends StatelessWidget {
+  const _StorageList({required this.itemBuilder, required this.source});
+
+  final Widget Function(BuildContext context, Map<String, dynamic> data) itemBuilder;
+
+  final Stream<QuerySnapshot<Map<String, dynamic>>> source;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: source,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+        if (snapshot.hasError) {
+          return Align(child: Text('Something went wrong ${snapshot.error}'));
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Align(
+            child: FractionallySizedBox(
+              widthFactor: 0.07,
+              heightFactor: 0.07,
+              child: FittedBox(child: CupertinoActivityIndicator()),
+            ),
+          );
+        }
+
+        // Empty
+        if (snapshot.data!.docs.isEmpty || !snapshot.hasData) {
+          return const Align(child: Text('No data'));
+        }
+
+        final data = snapshot.data!;
+
+        return ListView.builder(
+          itemCount: data.docs.length,
+          itemBuilder: (BuildContext context, int index) => itemBuilder(context, data.docs[index].data()),
+        );
+      },
     );
   }
 }
