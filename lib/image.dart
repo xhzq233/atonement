@@ -43,7 +43,11 @@ class WrapImage extends StatelessWidget {
             CustomCupertinoContextMenuAction(
               trailingIcon: const Icon(CupertinoIcons.photo_fill_on_rectangle_fill),
               child: const Text('详情'),
-              onPressed: () => navigator.push(ImagePageRoute(imageUrl: imageUrl)),
+              onPressed: () async {
+                navigator.pop();
+                await Future.delayed(const Duration(milliseconds: 300));
+                navigator.push(ImagePageRoute(imageUrl: imageUrl));
+              },
             ),
           ],
           child: Hero(tag: imageUrl, child: Image.network(imageUrl, fit: BoxFit.contain)),
