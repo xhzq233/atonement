@@ -94,10 +94,19 @@ void initNotification() async {
   }
 }
 
-Future<void> pushMessage(String content, {String? imageUrl}) async {
+Future<void> pushMessage(String content, {String? imageUrl, bool todo = false, bool completeOrRead = false}) async {
   if (content.isEmpty) {
     SmartDialog.showToast('内容为空');
     return Future.value();
+  }
+  String readKey = 'read';
+  if (todo) {
+    fireLogI('pushing todo:$content, complete:$completeOrRead');
+    readKey = 'complete';
+  }
+  if (pushingMessage.value) {
+    fireLogE('try pushing twice');
+    return;
   }
   pushingMessage.value = true;
   try {
@@ -108,7 +117,7 @@ Future<void> pushMessage(String content, {String? imageUrl}) async {
       'time': time,
       'send': displayName,
       'avatar': avatar,
-      'read': 0,
+      readKey: completeOrRead ? 1 : 0,
       'imageUrl': imageUrl,
     });
     final resp = await http.post(

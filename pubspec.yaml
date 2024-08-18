@@ -26,6 +26,7 @@ dependencies:
   url_launcher: ^6.3.0
   framework:
     git: https://github.com/xhzq233/framework.git
+  cached_network_image: ^3.4.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

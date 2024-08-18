@@ -20,7 +20,7 @@ class _Drawer extends StatelessWidget {
             title: const Text('Google 登录'),
             onTap: kIsWeb ? null : handleNoWebGoogleSignIn,
             leading: Obx(() => CircleAvatar(
-                foregroundImage: NetworkImage(currentUser.value.photoUrl),
+                foregroundImage: CachedNetworkImageProvider(currentUser.value.photoUrl),
                 onForegroundImageError: (exception, stackTrace) {})),
             trailing: Obx(() => hasAccount ? Text(displayName) : buildSignInButton(onPressed: handleNoWebGoogleSignIn)),
           ),

@@ -1,7 +1,10 @@
 import 'package:atonement/log.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:framework/cupertino.dart';
 
 import 'platform/upload_image.dart';
 
@@ -82,7 +85,7 @@ class PickImageWidget extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: CupertinoColors.systemGrey.resolveFrom(context), width: 1),
-          image: DecorationImage(image: ResizeImage(NetworkImage(url), width: 100, height: 100), fit: BoxFit.contain),
+          image: DecorationImage(image: CachedNetworkImageProvider(url), fit: BoxFit.contain),
         ),
       ),
     );
@@ -93,11 +96,12 @@ class PickImageWidget extends StatelessWidget {
     Widget widget;
 
     final loading = PickedImage.watch(context).loading;
+    final primary = Theme.of(context).colorScheme.primary;
 
     widget = switch (loading) {
-      PickImageState.loading => const CupertinoActivityIndicator(),
+      PickImageState.loading => CupertinoActivityIndicator(color: primary),
       PickImageState.done => _getImage(context),
-      PickImageState.none || PickImageState.error => const Icon(CupertinoIcons.photo_on_rectangle),
+      PickImageState.none || PickImageState.error => Icon(CupertinoIcons.photo_on_rectangle, color: primary),
     };
 
     VoidCallback? function;
@@ -105,7 +109,13 @@ class PickImageWidget extends StatelessWidget {
       function = () => _pickImage(context);
     }
 
-    widget = CupertinoButton(onPressed: function, child: widget);
+    widget = CustomCupertinoButton(
+      onTap: function,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: widget,
+      ),
+    );
 
     return widget;
   }

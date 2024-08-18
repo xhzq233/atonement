@@ -2,11 +2,12 @@ import 'package:atonement/bubble.dart';
 import 'package:atonement/pick_image.dart';
 import 'package:atonement/log.dart';
 import 'package:atonement/platform/change_pwa_bar_color.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-
+import 'package:framework/cupertino.dart';
 import 'package:atonement/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ import 'platform/sign_in_button.dart';
 import 'messaging.dart';
 
 part 'drawer.dart';
+
+part 'main_body.dart';
 
 void main() async {
   FlutterError.onError = (details) {
@@ -104,136 +107,87 @@ class _Home extends StatelessWidget {
                       child: const Icon(CupertinoIcons.person),
                     )),
           ),
-          const SliverFillRemaining(
-            child: Align(
-              child: FractionallySizedBox(
-                widthFactor: 0.8,
-                child: PickedImage(child: _TextField()),
-              ),
-            ),
-          ),
+          const SliverFillRemaining(child: PickedImage(child: _Content())),
         ],
       ),
     );
   }
 }
 
-class _TextField extends StatelessWidget {
-  const _TextField();
+class _Content extends StatefulWidget {
+  const _Content();
+
+  @override
+  State<_Content> createState() => _ContentState();
+}
+
+class _ContentState extends State<_Content> {
+  double page = 0;
+  int index = 0;
+
+  late final PageController _controller = PageController(initialPage: 0);
+  final tfController = TextEditingController();
+
+  ThemeDataTween? _tween;
+
+  ThemeDataTween _getTween() {
+    final Brightness brightness = MediaQuery.platformBrightnessOf(context);
+    final ThemeData begin, end;
+    if (brightness == Brightness.light) {
+      begin = lightThemeData;
+      end = ThemeData.lerp(lightThemeData, darkThemeData, 0.8);
+    } else {
+      begin = darkThemeData;
+      end = ThemeData.lerp(darkThemeData, lightThemeData, 0.8);
+    }
+    return ThemeDataTween(
+      begin: begin,
+      end: end,
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _tween = _getTween();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      page = _controller.page ?? 0;
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = TextEditingController();
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 300, minHeight: 200),
-          child: CupertinoTextField(
-            placeholder: "写点什么",
-            controller: controller,
-            clearButtonMode: OverlayVisibilityMode.editing,
-            textAlignVertical: TextAlignVertical.top,
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    _tween ??= _getTween();
+    return Theme(
+      data: _tween!.transform(page),
+      child: Builder(
+        builder: (context) => Stack(
+          fit: StackFit.expand,
           children: [
-            const PickImageWidget(),
-            Obx(
-              () => CupertinoButton(
-                onPressed: hasAccount && !pushingMessage.value
-                    ? () {
-                        pushMessage(
-                          controller.text,
-                          imageUrl: PickedImage.read(context).imageUrl,
-                        );
-                        controller.clear();
-                        PickedImage.read(context).setPickImageState(PickImageState.none);
-                      }
-                    : null,
-                child: const Icon(CupertinoIcons.paperplane),
+            ColoredBox(
+              color: Theme.of(context).colorScheme.surface,
+              child: PageView.builder(
+                  controller: _controller,
+                  itemCount: 2,
+                  onPageChanged: (i) => index = i,
+                  itemBuilder: (BuildContext context, int index) => const SizedBox.expand()),
+            ),
+            Align(
+              alignment: const Alignment(0, -0.2),
+              child: FractionallySizedBox(
+                widthFactor: 0.8,
+                child: _TextField(index == 1),
               ),
             ),
           ],
         ),
-      ],
-    );
-  }
-}
-
-class _Posts extends StatelessWidget {
-  const _Posts();
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('记录')),
-      child: _StorageList(
-        source: messageSource,
-        itemBuilder: (BuildContext context, Map<String, dynamic> data) => Bubble(data: data),
       ),
-    );
-  }
-}
-
-class _Todos extends StatelessWidget {
-  const _Todos();
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('愿望清单')),
-      child: _StorageList(
-        source: todoSource,
-        itemBuilder: (BuildContext context, Map<String, dynamic> data) => Bubble(data: data),
-      ),
-    );
-  }
-}
-
-class _StorageList extends StatelessWidget {
-  const _StorageList({required this.itemBuilder, required this.source});
-
-  final Widget Function(BuildContext context, Map<String, dynamic> data) itemBuilder;
-
-  final Stream<QuerySnapshot<Map<String, dynamic>>> source;
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: source,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-        if (snapshot.hasError) {
-          return Align(child: Text('Something went wrong ${snapshot.error}'));
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Align(
-            child: FractionallySizedBox(
-              widthFactor: 0.07,
-              heightFactor: 0.07,
-              child: FittedBox(child: CupertinoActivityIndicator()),
-            ),
-          );
-        }
-
-        // Empty
-        if (snapshot.data!.docs.isEmpty || !snapshot.hasData) {
-          return const Align(child: Text('No data'));
-        }
-
-        final data = snapshot.data!;
-
-        return ListView.builder(
-          itemCount: data.docs.length,
-          itemBuilder: (BuildContext context, int index) => itemBuilder(context, data.docs[index].data()),
-        );
-      },
     );
   }
 }
