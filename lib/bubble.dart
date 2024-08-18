@@ -17,14 +17,11 @@ class PostBubble extends StatelessWidget {
 
     final formattedDate = '${time.year}-${time.month}-${time.day} ${time.hour}:${time.minute}';
 
-    Widget avatarWidget;
-    if (data.avatar != null) {
-      avatarWidget = CircleAvatar(backgroundImage: CachedNetworkImageProvider(data.avatar!));
-    } else {
-      avatarWidget = const Icon(CupertinoIcons.person_crop_circle);
-    }
-
-    avatarWidget = SizedBox(width: 32, height: 32, child: avatarWidget);
+    final Widget avatarWidget = SizedBox(
+      width: 32,
+      height: 32,
+      child: CircleAvatar(backgroundImage: CachedNetworkImageProvider(data.avatar)),
+    );
 
     Widget body = SelectableText(data.content, style: Theme.of(context).textTheme.titleSmall!.apply(fontSizeDelta: 2));
     if (data.imageUrl != null) {
@@ -77,18 +74,14 @@ class TodoBubble extends StatelessWidget {
     final String sender = data.send;
     final String content = data.content;
     final time = data.time;
-    final String? avatar = data.avatar;
+    final String avatar = data.avatar;
     final bool complete = data.complete;
     final String? imageUrl = data.imageUrl;
 
     final formattedDate = '${time.year}-${time.month}-${time.day} ${time.hour}:${time.minute}';
 
     Widget avatarWidget;
-    if (avatar != null) {
-      avatarWidget = CircleAvatar(backgroundImage: CachedNetworkImageProvider(avatar));
-    } else {
-      avatarWidget = const Icon(CupertinoIcons.person);
-    }
+    avatarWidget = CircleAvatar(backgroundImage: CachedNetworkImageProvider(avatar));
 
     avatarWidget = SizedBox(width: 32, height: 32, child: avatarWidget);
 

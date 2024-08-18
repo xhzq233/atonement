@@ -43,7 +43,7 @@ class _Message {
   final String send;
   final String content;
   final DateTime time;
-  final String? avatar;
+  final String avatar;
   final String? imageUrl;
 
   _Message({
@@ -59,7 +59,7 @@ class _Message {
         'send': send,
         'content': content,
         'time': time.millisecondsSinceEpoch,
-        if (avatar != null) 'avatar': avatar,
+        'avatar': avatar,
         if (imageUrl != null) 'imageUrl': imageUrl,
       };
 }
@@ -256,7 +256,7 @@ Future<void> pushMessage(String content, {String? imageUrl, bool todo = false}) 
       'send': displayName,
       'avatar': avatar,
       readKey: 0,
-      'imageUrl': imageUrl,
+      if (imageUrl != null) 'imageUrl': imageUrl,
     });
     final resp = await http.post(
       Uri.parse('https://at.mar1sa.icu/push'),
