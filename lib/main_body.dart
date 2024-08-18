@@ -27,7 +27,7 @@ class _TextField extends StatelessWidget {
         ConstrainedBox(
           constraints: const BoxConstraints(maxHeight: 300, minHeight: 200),
           child: CupertinoTextField(
-            placeholder: todo ? "愿望清单" : "记录",
+            placeholder: todo ? "愿望" : "Posts",
             controller: controller,
             clearButtonMode: OverlayVisibilityMode.editing,
             textAlignVertical: TextAlignVertical.top,
@@ -91,7 +91,7 @@ class _Posts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('记录')),
+      navigationBar: const CupertinoNavigationBar(middle: Text('Posts')),
       child: _StorageList(
         source: messageSource,
         itemBuilder: (BuildContext context, Map<String, dynamic> data) => PostBubble(data: data),
@@ -106,7 +106,7 @@ class _Todos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('愿望清单')),
+      navigationBar: const CupertinoNavigationBar(middle: Text('愿望')),
       child: _StorageList(
         source: todoSource,
         itemBuilder: (BuildContext context, Map<String, dynamic> data) => PostBubble(data: data),
