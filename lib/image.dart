@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:framework/cupertino.dart';
 
@@ -10,7 +11,7 @@ import 'main.dart';
 
 class ImagePageRoute extends PhotoPageRoute {
   ImagePageRoute({required String imageUrl})
-      : super(draggableChild: Hero(tag: imageUrl, child: Image.network(imageUrl)));
+      : super(draggableChild: Hero(tag: imageUrl, child: CachedNetworkImage(imageUrl: imageUrl)));
 }
 
 class WrapImage extends StatelessWidget {
@@ -50,7 +51,7 @@ class WrapImage extends StatelessWidget {
               },
             ),
           ],
-          child: Hero(tag: imageUrl, child: Image.network(imageUrl, fit: BoxFit.contain)),
+          child: Hero(tag: imageUrl, child: CachedNetworkImage(fit: BoxFit.contain, imageUrl: imageUrl)),
         ),
       ),
     );

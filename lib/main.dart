@@ -104,7 +104,7 @@ class _Home extends StatelessWidget {
                       padding: EdgeInsets.zero,
                       // open drawer
                       onPressed: () => Scaffold.of(context).openDrawer(),
-                      child: const Icon(CupertinoIcons.person),
+                      child: const Icon(CupertinoIcons.person_crop_circle),
                     )),
           ),
           const SliverFillRemaining(child: PickedImage(child: _Content())),
@@ -135,10 +135,10 @@ class _ContentState extends State<_Content> {
     final ThemeData begin, end;
     if (brightness == Brightness.light) {
       begin = lightThemeData;
-      end = ThemeData.lerp(lightThemeData, darkThemeData, 0.8);
+      end = ThemeData.lerp(lightThemeData, darkThemeData, 0.9);
     } else {
       begin = darkThemeData;
-      end = ThemeData.lerp(darkThemeData, lightThemeData, 0.8);
+      end = ThemeData.lerp(darkThemeData, lightThemeData, 0.9);
     }
     return ThemeDataTween(
       begin: begin,

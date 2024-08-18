@@ -22,8 +22,10 @@ final CollectionReference<Map<String, dynamic>> _todoDb = FirebaseFirestore.inst
 // avatar
 // imageUrl
 // read
-Stream<QuerySnapshot<Map<String, dynamic>>> get messageSource =>
-    _messageDb.orderBy('time', descending: true).snapshots();
+Stream<QuerySnapshot<Post>> get postSource => _messageDb
+    .withConverter(fromFirestore: Post.fromFirestore, toFirestore: (value, _) => value.toJson())
+    .orderBy('time', descending: true)
+    .snapshots();
 
 // send
 // content
@@ -31,7 +33,108 @@ Stream<QuerySnapshot<Map<String, dynamic>>> get messageSource =>
 // avatar
 // imageUrl
 // complete
-Stream<QuerySnapshot<Map<String, dynamic>>> get todoSource => _todoDb.orderBy('time', descending: true).snapshots();
+Stream<QuerySnapshot<Todo>> get todoSource => _todoDb
+    .withConverter(fromFirestore: Todo.fromFirestore, toFirestore: (value, _) => value.toJson())
+    .orderBy('time', descending: true)
+    .snapshots();
+
+class _Message {
+  final String id;
+  final String send;
+  final String content;
+  final DateTime time;
+  final String? avatar;
+  final String? imageUrl;
+
+  _Message({
+    required this.id,
+    required this.send,
+    required this.content,
+    required this.time,
+    required this.avatar,
+    required this.imageUrl,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'send': send,
+        'content': content,
+        'time': time.millisecondsSinceEpoch,
+        if (avatar != null) 'avatar': avatar,
+        if (imageUrl != null) 'imageUrl': imageUrl,
+      };
+}
+
+class Post extends _Message {
+  final bool read;
+
+  Post({
+    required super.id,
+    required super.send,
+    required super.content,
+    required super.time,
+    required super.avatar,
+    required super.imageUrl,
+    required this.read,
+  });
+
+  factory Post.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+    return Post(
+      id: snapshot.id,
+      send: data?['send'] ?? 'Unknown',
+      content: data?['content'] ?? 'NA',
+      time: DateTime.fromMillisecondsSinceEpoch(data?['time'] ?? 0),
+      avatar: data?['avatar'] ?? '',
+      imageUrl: data?['imageUrl'],
+      read: data?['read'] == 1,
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ...super.toJson(),
+        'read': read ? 1 : 0,
+      };
+}
+
+class Todo extends _Message {
+  final bool complete;
+
+  Todo({
+    required super.id,
+    required super.send,
+    required super.content,
+    required super.time,
+    required super.avatar,
+    required super.imageUrl,
+    required this.complete,
+  });
+
+  factory Todo.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+    return Todo(
+      id: snapshot.id,
+      send: data?['send'] ?? 'Unknown',
+      content: data?['content'] ?? 'NA',
+      time: DateTime.fromMillisecondsSinceEpoch(data?['time'] ?? 0),
+      avatar: data?['avatar'] ?? '',
+      imageUrl: data?['imageUrl'],
+      complete: data?['complete'] == 1,
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ...super.toJson(),
+        'complete': complete ? 1 : 0,
+      };
+}
 
 final RxString fcmToken = 'null'.obs;
 
@@ -94,30 +197,65 @@ void initNotification() async {
   }
 }
 
-Future<void> pushMessage(String content, {String? imageUrl, bool todo = false, bool completeOrRead = false}) async {
+Future<void> completeTodo(Todo todo) async {
+  final DocumentReference<Map<String, dynamic>> doc = _todoDb.doc(todo.id);
+  if (pushingMessage.value) {
+    fireLogE('try completeTodo${todo.toJson()} twice');
+    return;
+  }
+  pushingMessage.value = true;
+  try {
+    await doc.update({'complete': 1});
+
+    final resp = await http.post(
+      Uri.parse('https://at.mar1sa.icu/push'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'sender': displayName,
+          'content': '「${todo.content}」 已完成',
+          'avatar': currentUser.value.photoUrl,
+        },
+      ),
+    );
+
+    fireLogI('${todo.content} completed: ${todo.id}, response: ${resp.body}');
+    SmartDialog.showToast('${todo.content} completed');
+  } catch (e) {
+    fireLogE(e.toString());
+    SmartDialog.showToast(e.toString());
+  }
+
+  pushingMessage.value = false;
+}
+
+Future<void> pushMessage(String content, {String? imageUrl, bool todo = false}) async {
   if (content.isEmpty) {
     SmartDialog.showToast('内容为空');
     return Future.value();
   }
   String readKey = 'read';
+  final CollectionReference<Map<String, dynamic>> targetDb = todo ? _todoDb : _messageDb;
   if (todo) {
-    fireLogI('pushing todo:$content, complete:$completeOrRead');
+    fireLogI('pushing todo:$content');
     readKey = 'complete';
   }
   if (pushingMessage.value) {
-    fireLogE('try pushing twice');
+    fireLogE('try pushing "$content" twice');
     return;
   }
   pushingMessage.value = true;
   try {
     final time = DateTime.now().millisecondsSinceEpoch;
     final avatar = currentUser.value.photoUrl;
-    final DocumentReference doc = await _messageDb.add({
+    final DocumentReference doc = await targetDb.add({
       'content': content,
       'time': time,
       'send': displayName,
       'avatar': avatar,
-      readKey: completeOrRead ? 1 : 0,
+      readKey: 0,
       'imageUrl': imageUrl,
     });
     final resp = await http.post(
@@ -128,7 +266,7 @@ Future<void> pushMessage(String content, {String? imageUrl, bool todo = false, b
       body: jsonEncode(
         <String, dynamic>{
           'sender': displayName,
-          'content': content,
+          'content': todo ? '愿望：$content' : content,
           'avatar': avatar,
         },
       ),

@@ -12,6 +12,7 @@ class _TextField extends StatelessWidget {
     pushMessage(
       controller.text,
       imageUrl: PickedImage.read(context).imageUrl,
+      todo: todo,
     );
     controller.clear();
     PickedImage.read(context).setPickImageState(PickImageState.none);
@@ -27,7 +28,7 @@ class _TextField extends StatelessWidget {
         ConstrainedBox(
           constraints: const BoxConstraints(maxHeight: 300, minHeight: 200),
           child: CupertinoTextField(
-            placeholder: todo ? "愿望" : "Posts",
+            placeholder: todo ? "Wishes" : "Posts",
             controller: controller,
             clearButtonMode: OverlayVisibilityMode.editing,
             textAlignVertical: TextAlignVertical.top,
@@ -64,7 +65,6 @@ class _TextField extends StatelessWidget {
                     color = Theme.of(context).colorScheme.secondary;
                     voidCallback = null;
                   }
-                  CupertinoButton;
                   return CustomCupertinoButton(
                     onTap: voidCallback,
                     child: Padding(
@@ -93,8 +93,8 @@ class _Posts extends StatelessWidget {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(middle: Text('Posts')),
       child: _StorageList(
-        source: messageSource,
-        itemBuilder: (BuildContext context, Map<String, dynamic> data) => PostBubble(data: data),
+        source: postSource,
+        itemBuilder: (BuildContext context, Post data) => PostBubble(data: data),
       ),
     );
   }
@@ -106,27 +106,27 @@ class _Todos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('愿望')),
+      navigationBar: const CupertinoNavigationBar(middle: Text('Wishes')),
       child: _StorageList(
         source: todoSource,
-        itemBuilder: (BuildContext context, Map<String, dynamic> data) => PostBubble(data: data),
+        itemBuilder: (BuildContext context, data) => TodoBubble(data: data),
       ),
     );
   }
 }
 
-class _StorageList extends StatelessWidget {
+class _StorageList<T> extends StatelessWidget {
   const _StorageList({required this.itemBuilder, required this.source});
 
-  final Widget Function(BuildContext context, Map<String, dynamic> data) itemBuilder;
+  final Widget Function(BuildContext context, T data) itemBuilder;
 
-  final Stream<QuerySnapshot<Map<String, dynamic>>> source;
+  final Stream<QuerySnapshot<T>> source;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: source,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
         if (snapshot.hasError) {
           return Align(child: Text('Something went wrong ${snapshot.error}'));
         }
@@ -146,7 +146,7 @@ class _StorageList extends StatelessWidget {
           return const Align(child: Text('No data'));
         }
 
-        final data = snapshot.data!;
+        final QuerySnapshot<T> data = snapshot.data!;
 
         return ListView.builder(
           itemCount: data.docs.length,
