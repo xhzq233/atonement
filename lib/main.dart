@@ -2,7 +2,6 @@ import 'package:atonement/bubble.dart';
 import 'package:atonement/pick_image.dart';
 import 'package:atonement/log.dart';
 import 'package:atonement/platform/change_pwa_bar_color.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/state_manager.dart';
 import 'account.dart';
 import 'firebase_options.dart';
+import 'image.dart';
 import 'platform/sign_in_button.dart';
 import 'messaging.dart';
 

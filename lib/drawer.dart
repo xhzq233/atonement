@@ -19,9 +19,7 @@ class _Drawer extends StatelessWidget {
           CupertinoListTile.notched(
             title: const Text('Google 登录'),
             onTap: kIsWeb ? null : handleNoWebGoogleSignIn,
-            leading: Obx(() => CircleAvatar(
-                foregroundImage: CachedNetworkImageProvider(currentUser.value.photoUrl),
-                onForegroundImageError: (exception, stackTrace) {})),
+            leading: Obx(() => NNAvatar(imageUrl: currentUser.value.photoUrl)),
             trailing: Obx(() => hasAccount ? Text(displayName) : buildSignInButton(onPressed: handleNoWebGoogleSignIn)),
           ),
           CupertinoListTile.notched(
@@ -35,11 +33,6 @@ class _Drawer extends StatelessWidget {
             leading: Icon(CupertinoIcons.bell, color: CupertinoColors.systemYellow),
             trailing: CupertinoListTileChevron(),
             onTap: initNotification,
-          ),
-          const CupertinoListTile.notched(
-            title: Text('登出'),
-            leading: Icon(CupertinoIcons.power, color: CupertinoColors.systemRed),
-            onTap: handleSignOut,
           ),
           // Switcher
         ],

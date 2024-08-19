@@ -1,5 +1,5 @@
+import 'package:atonement/image.dart';
 import 'package:atonement/log.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +55,7 @@ class PickImageWidget extends StatelessWidget {
     PickedImage.read(context).setPickImageState(PickImageState.loading);
     try {
       final FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'png', 'jpeg', 'gif'],
+        type: FileType.image,
       );
       if (result != null && result.files.isNotEmpty) {
         final url = await uploadImage(file: result.files.single);
@@ -81,13 +80,7 @@ class PickImageWidget extends StatelessWidget {
     return SizedBox(
       width: 100,
       height: 100,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: CupertinoColors.systemGrey.resolveFrom(context), width: 1),
-          image: DecorationImage(image: CachedNetworkImageProvider(url), fit: BoxFit.contain),
-        ),
-      ),
+      child: WrapImage(imageUrl: url),
     );
   }
 

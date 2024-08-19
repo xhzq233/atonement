@@ -1,6 +1,5 @@
 import 'package:atonement/image.dart';
 import 'package:boxy/flex.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,11 +16,7 @@ class PostBubble extends StatelessWidget {
 
     final formattedDate = '${time.year}-${time.month}-${time.day} ${time.hour}:${time.minute}';
 
-    final Widget avatarWidget = SizedBox(
-      width: 32,
-      height: 32,
-      child: CircleAvatar(backgroundImage: CachedNetworkImageProvider(data.avatar)),
-    );
+    final Widget avatarWidget = NNAvatar(imageUrl: data.avatar);
 
     Widget body = SelectableText(data.content, style: Theme.of(context).textTheme.titleSmall!.apply(fontSizeDelta: 2));
     if (data.imageUrl != null) {
@@ -80,10 +75,7 @@ class TodoBubble extends StatelessWidget {
 
     final formattedDate = '${time.year}-${time.month}-${time.day} ${time.hour}:${time.minute}';
 
-    Widget avatarWidget;
-    avatarWidget = CircleAvatar(backgroundImage: CachedNetworkImageProvider(avatar));
-
-    avatarWidget = SizedBox(width: 32, height: 32, child: avatarWidget);
+    Widget avatarWidget = NNAvatar(imageUrl: avatar);
 
     Widget body = SelectableText(content, style: Theme.of(context).textTheme.titleSmall!.apply(fontSizeDelta: 2));
     body = BoxyRow(
