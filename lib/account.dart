@@ -52,15 +52,6 @@ class LocalAccount {
   });
 }
 
-Future<void> handleSignOut() async {
-  try {
-    await FirebaseAuth.instance.signOut();
-  } catch (error) {
-    fireLogE(error.toString());
-    SmartDialog.showToast(error.toString());
-  }
-}
-
 Future<void> handleNoWebGoogleSignIn() async {
   try {
     await _googleSignIn.signIn();
