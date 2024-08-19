@@ -23,6 +23,13 @@ part 'drawer.dart';
 part 'main_body.dart';
 
 void main() async {
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    final Object exception = details.exception;
+    return ErrorWidget.withDetails(
+      message: details.exceptionAsString(),
+      error: exception is FlutterError ? exception : null,
+    );
+  };
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
     fireLogE(details.exception.toString());
