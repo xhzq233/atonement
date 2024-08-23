@@ -21,13 +21,15 @@ class _TextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.findAncestorStateOfType<_ContentState>()!.tfController;
-
+    final theme = Theme.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ConstrainedBox(
           constraints: const BoxConstraints(maxHeight: 300, minHeight: 200),
           child: CupertinoTextField(
+            style: TextStyle(fontSize: 16.0, inherit: false, color: theme.colorScheme.onSurface),
+            placeholderStyle: TextStyle(fontSize: 16.0, inherit: false, color: theme.colorScheme.secondary),
             placeholder: todo ? "Wishes" : "Posts",
             controller: controller,
             clearButtonMode: OverlayVisibilityMode.editing,
@@ -36,10 +38,10 @@ class _TextField extends StatelessWidget {
             maxLines: null,
             autocorrect: false,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerLow,
+              color: theme.colorScheme.surfaceContainerLow,
               border: Border.fromBorderSide(
                 BorderSide(
-                  color: Theme.of(context).colorScheme.outline,
+                  color: theme.colorScheme.outline,
                   width: 0.0,
                 ),
               ),
@@ -53,7 +55,7 @@ class _TextField extends StatelessWidget {
           children: [
             const PickImageWidget(),
             Obx(
-              () {
+                  () {
                 final enable = hasAccount && !pushingMessage.value;
                 return Builder(builder: (context) {
                   final Color color;
