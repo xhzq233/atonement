@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:atonement/bubble.dart';
 import 'package:atonement/pick_image.dart';
 import 'package:atonement/log.dart';
@@ -17,34 +19,31 @@ import 'firebase_options.dart';
 import 'image.dart';
 import 'platform/sign_in_button.dart';
 import 'messaging.dart';
+import 'package:framework/base.dart';
 
 part 'drawer.dart';
 
 part 'main_body.dart';
 
+class _CatcherDelegate with Catcher {
+  @override
+  void handleException(String name, String reason, String stackTrace) {
+    fireLogE('$name: $reason\n$stackTrace');
+  }
+
+  @override
+  void main() async {
+    runApp(const MyApp());
+
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await initLog();
+    initMessaging();
+    initAccount();
+  }
+}
+
 void main() async {
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    final Object exception = details.exception;
-    return ErrorWidget.withDetails(
-      message: details.exceptionAsString(),
-      error: exception is FlutterError ? exception : null,
-    );
-  };
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    fireLogE(details.exception.toString());
-  };
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FlutterError.reportError(FlutterErrorDetails(exception: error, stack: stack));
-    return true;
-  };
-
-  runApp(const MyApp());
-
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await initLog();
-  initMessaging();
-  initAccount();
+  Catcher.init(delegate: _CatcherDelegate());
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();

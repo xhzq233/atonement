@@ -31,6 +31,9 @@ migrate_working_dir/
 .pub/
 /build/
 pubspec.lock
+**/Podfile.lock
+.fvm
+.fvmrc
 
 # Symbolication related
 app.*.symbols
