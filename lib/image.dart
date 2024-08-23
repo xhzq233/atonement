@@ -11,7 +11,8 @@ import 'log.dart';
 import 'main.dart';
 
 class ImagePageRoute extends PhotoPageRoute {
-  ImagePageRoute({required String imageUrl}) : super(draggableChild: Hero(tag: imageUrl, child: NNImage(imageUrl)));
+  ImagePageRoute({required String imageUrl, String? tag})
+      : super(draggableChild: Hero(tag: tag ?? imageUrl, child: NNImage(imageUrl)));
 }
 
 class WrapImage extends StatelessWidget {
@@ -105,12 +106,18 @@ class NNAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scaledSize = MediaQuery.textScalerOf(context).scale(size);
+    final tag = imageUrl + hashCode.toString();
     return CustomCupertinoButton(
-      onTap: () => navigator.push(ImagePageRoute(imageUrl: imageUrl)),
+      onTap: () => navigator.push(ImagePageRoute(imageUrl: imageUrl, tag: tag)),
       child: SizedBox(
         width: scaledSize,
         height: scaledSize,
-        child: FittedBox(child: ClipOval(child: NNImage(imageUrl, fit: BoxFit.contain))),
+        child: FittedBox(
+          child: Hero(
+            tag: tag,
+            child: ClipOval(child: NNImage(imageUrl, fit: BoxFit.contain)),
+          ),
+        ),
       ),
     );
   }

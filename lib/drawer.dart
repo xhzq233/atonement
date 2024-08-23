@@ -16,11 +16,13 @@ class _Drawer extends StatelessWidget {
           child: const Text('信息'),
         ),
         children: [
-          CupertinoListTile.notched(
-            title: const Text('Google 登录'),
-            onTap: kIsWeb ? null : handleNoWebGoogleSignIn,
-            leading: Obx(() => NNAvatar(imageUrl: currentUser.value.photoUrl)),
-            trailing: Obx(() => hasAccount ? Text(displayName) : buildSignInButton(onPressed: handleNoWebGoogleSignIn)),
+          Obx(
+            () => CupertinoListTile.notched(
+              title: const Text('Google 登录'),
+              onTap: kIsWeb ? null : (hasAccount ? null : handleNoWebGoogleSignIn),
+              leading: NNAvatar(imageUrl: currentUser.value.photoUrl),
+              trailing: hasAccount ? Text(displayName) : buildSignInButton(onPressed: handleNoWebGoogleSignIn),
+            ),
           ),
           CupertinoListTile.notched(
             title: const Text('FCM Token'),
