@@ -43,5 +43,5 @@ void _log(String message, String type) {
       'device': device,
     });
   }
-  log('$type: $message');
+  debugPrint('$type: $message');
 }
