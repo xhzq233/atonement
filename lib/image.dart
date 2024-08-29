@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:framework/cupertino.dart';
 
@@ -69,7 +70,7 @@ class NNImage extends CachedNetworkImage {
   static Widget defaultErrorWidgetBuilder(BuildContext context, String url, dynamic error) =>
       const Icon(CupertinoIcons.exclamationmark_circle);
 
-  static Widget defaultPlaceHolderWidgetBuilder(BuildContext context, String url) => const CupertinoActivityIndicator();
+  static Widget defaultPlaceHolderWidgetBuilder(BuildContext context, String url) => const CircularProgressIndicator();
 
   NNImage(
     String imageUrl, {
