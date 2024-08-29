@@ -54,6 +54,10 @@ class LocalAccount {
 
 Future<void> handleNoWebGoogleSignIn() async {
   try {
+    if (_googleSignIn.currentUser != null) {
+      fireLogE('Signing out when already signed in...');
+      await _googleSignIn.signOut();
+    }
     await _googleSignIn.signIn();
   } catch (error) {
     fireLogE(error.toString());
