@@ -5,6 +5,7 @@ import 'package:atonement/pick_image.dart';
 import 'package:atonement/log.dart';
 import 'package:atonement/platform/change_pwa_bar_color.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -27,8 +28,14 @@ part 'main_body.dart';
 
 class _CatcherDelegate with Catcher {
   @override
-  void handleException(String name, String reason, String stackTrace) {
-    fireLogE('$name: $reason\n$stackTrace');
+  void handleException(String name, String reason, StackTrace stackTrace) {
+    FirebaseCrashlytics.instance.recordError(name, stackTrace, reason: reason, printDetails: true);
+  }
+
+  @override
+  void handleFlutterError(FlutterErrorDetails errorDetails) {
+    FlutterError.presentError(errorDetails);
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
   }
 
   @override

@@ -28,6 +28,8 @@ dependencies:
     git: https://github.com/xhzq233/framework.git
   cached_network_image: ^3.4.0
   flutter_cache_manager: ^3.4.0
+  firebase_crashlytics: ^4.1.0
+  firebase_analytics: ^11.3.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

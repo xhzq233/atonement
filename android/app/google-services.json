@@ -24,6 +24,13 @@
             {
               "client_id": "80750108764-kfjd619q2e4cchruateg3uv0j32ncnrc.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "80750108764-gp93ka8tuoh1lqjtpae1n4g9n8bkgkpl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "xyz.xhzq.atonement-app"
+              }
             }
           ]
         }
