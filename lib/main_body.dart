@@ -11,11 +11,11 @@ class _TextField extends StatelessWidget {
   void _send(BuildContext context, TextEditingController controller) {
     pushMessage(
       controller.text,
-      imageUrl: PickedImage.read(context).imageUrl,
+      imageUrl: Provider.read<PickedImageProvider>(context).imageUrl,
       todo: todo,
     );
     controller.clear();
-    PickedImage.read(context).setPickImageState(PickImageState.none);
+    Provider.read<PickedImageProvider>(context).setPickImageState(PickImageState.none);
   }
 
   @override
@@ -55,7 +55,7 @@ class _TextField extends StatelessWidget {
           children: [
             const PickImageWidget(),
             Obx(
-                  () {
+              () {
                 final enable = hasAccount && !pushingMessage.value;
                 return Builder(builder: (context) {
                   final Color color;

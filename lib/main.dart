@@ -120,7 +120,7 @@ class _Home extends StatelessWidget {
                       child: const Icon(CupertinoIcons.person_crop_circle),
                     )),
           ),
-          const SliverFillRemaining(child: PickedImage(child: _Content())),
+          SliverFillRemaining(child: ProviderWidget(provider: PickedImageProvider(), child: const _Content())),
         ],
       ),
     );
