@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC-znm-cZScRI33ASKqfYKysMcqkCyXSWA',
-    appId: '1:80750108764:android:610e0ca6fecdc493430699',
+    appId: '1:80750108764:android:aa6898449f267008430699',
     messagingSenderId: '80750108764',
     projectId: 'xhzq233-firebase-demo',
     storageBucket: 'xhzq233-firebase-demo.appspot.com',
@@ -60,22 +60,20 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDdwLlA6fQbuz_cV2qHgVq9Har0X3UgE-s',
-    appId: '1:80750108764:ios:22b737364becc187430699',
+    appId: '1:80750108764:ios:04ac047bc352fe2c430699',
     messagingSenderId: '80750108764',
     projectId: 'xhzq233-firebase-demo',
     storageBucket: 'xhzq233-firebase-demo.appspot.com',
-    iosClientId: '80750108764-1c9gmj9ds5sp85unruqgrs5j41mqgq7f.apps.googleusercontent.com',
-    iosBundleId: 'xyz.xhzq.atonement',
+    iosBundleId: 'xyz.xhzq.atonement-app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDdwLlA6fQbuz_cV2qHgVq9Har0X3UgE-s',
-    appId: '1:80750108764:ios:20c03a4e931003ee430699',
+    appId: '1:80750108764:ios:04ac047bc352fe2c430699',
     messagingSenderId: '80750108764',
     projectId: 'xhzq233-firebase-demo',
     storageBucket: 'xhzq233-firebase-demo.appspot.com',
-    iosClientId: '80750108764-3ue1o2tjahr6skrs168ltg9mep8ntsqn.apps.googleusercontent.com',
-    iosBundleId: 'com.example.atonement',
+    iosBundleId: 'xyz.xhzq.atonement-app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -87,5 +85,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'xhzq233-firebase-demo.appspot.com',
     measurementId: 'G-ERQ16DJSF5',
   );
-
 }

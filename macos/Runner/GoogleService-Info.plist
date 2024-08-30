@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CLIENT_ID</key>
-	<string>80750108764-1c9gmj9ds5sp85unruqgrs5j41mqgq7f.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.80750108764-1c9gmj9ds5sp85unruqgrs5j41mqgq7f</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDdwLlA6fQbuz_cV2qHgVq9Har0X3UgE-s</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>xyz.xhzq.atonement</string>
+	<string>xyz.xhzq.atonement-app</string>
 	<key>PROJECT_ID</key>
 	<string>xhzq233-firebase-demo</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:80750108764:ios:22b737364becc187430699</string>
+	<string>1:80750108764:ios:04ac047bc352fe2c430699</string>
 </dict>
 </plist>
