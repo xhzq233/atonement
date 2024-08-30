@@ -8,10 +8,13 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'log.dart';
 
-GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
-  'email',
-  // 'https://www.googleapis.com/auth/cloud-platform',
-]);
+GoogleSignIn _googleSignIn = GoogleSignIn(
+  scopes: [
+    'email',
+    // 'https://www.googleapis.com/auth/cloud-platform',
+  ],
+  clientId: '80750108764-gp93ka8tuoh1lqjtpae1n4g9n8bkgkpl.apps.googleusercontent.com'
+);
 
 final Rx<LocalAccount> currentUser = LocalAccount.empty.obs;
 
