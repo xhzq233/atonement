@@ -197,7 +197,7 @@ jobs:
           path: App.zip
 
   release:
-    needs: [ build, build_apk, build_windows_zip, build_ipa, build_macos ]
+    needs: [ build, build_apk, build_windows_zip, build_ipa ] # build_macos
     runs-on: ubuntu-20.04
     env:
       VERSION: ${{ needs.build.outputs.version }}
