@@ -40,7 +40,7 @@ void _log(String message, String type) {
       'message': message,
       'type': type,
       'user': displayName,
-      'time': DateTime.now().millisecondsSinceEpoch,
+      'time': DateTime.now().toString(),
       'device': device,
     });
   }

@@ -55,7 +55,7 @@ void main() async {
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-NavigatorState get navigator => navigatorKey.currentState!;
+NavigatorState get rootNavigator => navigatorKey.currentState!;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -101,12 +101,12 @@ class _Home extends StatelessWidget {
               children: [
                 CupertinoButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () => navigator.pushNamed('/todos'),
+                  onPressed: () => rootNavigator.pushNamed('/todos'),
                   child: const Icon(CupertinoIcons.text_badge_checkmark),
                 ),
                 CupertinoButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () => navigator.pushNamed('/posts'),
+                  onPressed: () => rootNavigator.pushNamed('/posts'),
                   child: const Icon(CupertinoIcons.chat_bubble_2),
                 ),
               ],
@@ -120,7 +120,12 @@ class _Home extends StatelessWidget {
                       child: const Icon(CupertinoIcons.person_crop_circle),
                     )),
           ),
-          SliverFillRemaining(child: ProviderWidget(provider: PickedImageProvider(), child: const _Content())),
+          SliverFillRemaining(
+            child: ProviderWidget(
+              provider: (ctx) => PickedImageProvider(),
+              child: const _Content(),
+            ),
+          ),
         ],
       ),
     );

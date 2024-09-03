@@ -26,7 +26,7 @@ class WrapImage extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: GestureDetector(
-        onTap: () => navigator.push(ImagePageRoute(imageUrl: imageUrl)),
+        onTap: () => rootNavigator.push(ImagePageRoute(imageUrl: imageUrl)),
         child: CustomCupertinoContextMenu(
           previewMaxScale: 2.5,
           actions: [
@@ -47,9 +47,9 @@ class WrapImage extends StatelessWidget {
               trailingIcon: const Icon(CupertinoIcons.photo_fill_on_rectangle_fill),
               child: const Text('详情'),
               onPressed: () async {
-                navigator.pop();
+                rootNavigator.pop();
                 await Future.delayed(const Duration(milliseconds: 300));
-                navigator.push(ImagePageRoute(imageUrl: imageUrl));
+                rootNavigator.push(ImagePageRoute(imageUrl: imageUrl));
               },
             ),
           ],
@@ -109,7 +109,7 @@ class NNAvatar extends StatelessWidget {
     final scaledSize = MediaQuery.textScalerOf(context).scale(size);
     final tag = imageUrl + hashCode.toString();
     return CustomCupertinoButton(
-      onTap: () => navigator.push(ImagePageRoute(imageUrl: imageUrl, tag: tag)),
+      onTap: () => rootNavigator.push(ImagePageRoute(imageUrl: imageUrl, tag: tag)),
       child: SizedBox(
         width: scaledSize,
         height: scaledSize,

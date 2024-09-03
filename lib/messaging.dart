@@ -5,12 +5,13 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'account.dart';
 import 'log.dart';
+import 'main.dart';
 
 final CollectionReference<Map<String, dynamic>> _messageDb = FirebaseFirestore.instance.collection('messages');
 
@@ -328,6 +329,6 @@ Future<void> setupInteractedMessage() async {
 void _handleMessage(RemoteMessage message) {
   fireLogI('A message caused the application to open: ${message.data}');
   if (message.data['path'] == '/posts') {
-    Get.toNamed('/post');
+    rootNavigator.pushNamed('/post');
   }
 }
