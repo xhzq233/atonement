@@ -25,7 +25,8 @@ dependencies:
   boxy: ^2.2.0
   url_launcher: ^6.3.0
   framework:
-    git: https://github.com/xhzq233/framework.git
+    git:
+      url: https://github.com/xhzq233/framework.git
   cached_network_image: ^3.4.0
   flutter_cache_manager: ^3.4.0
   firebase_crashlytics: ^4.1.0

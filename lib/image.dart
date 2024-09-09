@@ -1,11 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:framework/cupertino.dart';
 
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:framework/route.dart';
+import 'package:framework/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'log.dart';
@@ -58,44 +56,6 @@ class WrapImage extends StatelessWidget {
       ),
     );
   }
-}
-
-final CacheManager imageCacheManager = CacheManager(Config(
-  'image_cache',
-  maxNrOfCacheObjects: 500,
-  stalePeriod: const Duration(days: 999),
-));
-
-class NNImage extends CachedNetworkImage {
-  static Widget defaultErrorWidgetBuilder(BuildContext context, String url, dynamic error) =>
-      const Icon(CupertinoIcons.exclamationmark_circle);
-
-  static Widget defaultPlaceHolderWidgetBuilder(BuildContext context, String url) => const CircularProgressIndicator();
-
-  NNImage(
-    String imageUrl, {
-    super.key,
-    super.width,
-    super.height,
-    super.fit,
-    super.placeholder = defaultPlaceHolderWidgetBuilder,
-    super.errorWidget = defaultErrorWidgetBuilder,
-    super.fadeInDuration,
-    super.fadeOutDuration,
-    super.placeholderFadeInDuration,
-    super.cacheKey,
-    super.imageBuilder,
-  }) : super(cacheManager: imageCacheManager, imageUrl: imageUrl);
-}
-
-class NNImageProvider extends CachedNetworkImageProvider {
-  NNImageProvider(
-    super.url, {
-    super.maxWidth,
-    super.maxHeight,
-    super.cacheKey,
-    super.errorListener,
-  }) : super(cacheManager: imageCacheManager);
 }
 
 class NNAvatar extends StatelessWidget {
