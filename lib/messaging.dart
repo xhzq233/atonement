@@ -328,7 +328,7 @@ Future<void> setupInteractedMessage() async {
 
 void _handleMessage(RemoteMessage message) {
   fireLogI('A message caused the application to open: ${message.data}');
-  if (message.data['path'] ！= null) {
+  if (message.data['path'] != null) {
     rootNavigator.pushNamed(message.data['path']);
   }
 }
