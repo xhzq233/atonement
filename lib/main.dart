@@ -121,7 +121,7 @@ class _Home extends StatelessWidget {
                     )),
           ),
           SliverFillRemaining(
-            child: ProviderWidget(
+            child: ProviderWidget.owned(
               provider: (ctx) => PickedImageProvider(),
               child: const _Content(),
             ),
