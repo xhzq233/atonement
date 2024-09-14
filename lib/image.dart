@@ -9,11 +9,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'log.dart';
 import 'main.dart';
 
-class ImagePageRoute extends PhotoPageRoute {
-  ImagePageRoute({required String imageUrl, String? tag})
-      : super(draggableChild: Hero(tag: tag ?? imageUrl, child: NNImage(imageUrl)));
-}
-
 class WrapImage extends StatelessWidget {
   const WrapImage({super.key, required this.imageUrl});
 
@@ -21,10 +16,12 @@ class WrapImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final child = NNImage(imageUrl, fit: BoxFit.contain);
+    final tag = hashCode;
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: GestureDetector(
-        onTap: () => rootNavigator.push(ImagePageRoute(imageUrl: imageUrl)),
+        onTap: () => rootNavigator.push(PhotoPageRoute(draggableChild: child, heroTag: tag)),
         child: CustomCupertinoContextMenu(
           previewMaxScale: 2.5,
           actions: [
@@ -47,11 +44,11 @@ class WrapImage extends StatelessWidget {
               onPressed: () async {
                 rootNavigator.pop();
                 await Future.delayed(const Duration(milliseconds: 300));
-                rootNavigator.push(ImagePageRoute(imageUrl: imageUrl));
+                rootNavigator.push(PhotoPageRoute(draggableChild: child, heroTag: tag));
               },
             ),
           ],
-          child: Hero(tag: imageUrl, child: NNImage(imageUrl, fit: BoxFit.contain)),
+          child: Hero(tag: imageUrl, child: child),
         ),
       ),
     );
@@ -67,16 +64,17 @@ class NNAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scaledSize = MediaQuery.textScalerOf(context).scale(size);
-    final tag = imageUrl + hashCode.toString();
+    final tag = hashCode;
+    final child = NNImage(imageUrl, fit: BoxFit.contain);
     return CustomCupertinoButton(
-      onTap: () => rootNavigator.push(ImagePageRoute(imageUrl: imageUrl, tag: tag)),
+      onTap: () => rootNavigator.push(PhotoPageRoute(draggableChild: child, heroTag: tag)),
       child: SizedBox(
         width: scaledSize,
         height: scaledSize,
         child: FittedBox(
           child: Hero(
             tag: tag,
-            child: ClipOval(child: NNImage(imageUrl, fit: BoxFit.contain)),
+            child: ClipOval(child: child),
           ),
         ),
       ),
