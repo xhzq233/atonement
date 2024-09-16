@@ -8,6 +8,7 @@ env:
   CACHE_KEY: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
   APP_NAME: "Atonement"
 
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -97,19 +98,13 @@ jobs:
 
       - name: Build iOS
         run: |
-          flutter build ipa --release
-          cd build/ios/iphoneos
-          mkdir Payload
-          cd Payload
-          ln -s ../Runner.app
-          cd ..
-          zip -r app.ipa Payload
+          flutter build ipa --export-options-plist=exportOptions.plist
 
       - name: Upload IPA
         uses: actions/upload-artifact@v3
         with:
           name: ipa-result
-          path: build/ios/iphoneos/app.ipa
+          path: build/ios/ipa/*.ipa
 
   build_macos:
     needs: build
@@ -119,12 +114,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install the Apple certificate and provisioning profile
+      - name: Install the Apple certificate
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          IDENTITY: "Apple Distribution: Wuhan Shuchen Technology Co., Ltd. (8N7W8ZCSHP)"
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
@@ -142,7 +136,6 @@ jobs:
           security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
-          security find-identity
 
       - name: Download generated files
         uses: actions/download-artifact@v3
@@ -162,7 +155,12 @@ jobs:
         run: flutter build macos --release
 
       - name: Sign macOS
-        run: /usr/bin/codesign --force --deep -s ${{ env.IDENTITY }} ./build/macos/Build/Products/Release/*.app
+        run: |
+          # Before signing
+          codesign -dv --verbose=4 ./build/macos/Build/Products/Release/*.app
+          /usr/bin/codesign --force --deep -s 'Apple Distribution: Wuhan Shuchen Technology Co., Ltd. (8N7W8ZCSHP)' ./build/macos/Build/Products/Release/*.app
+          # After signing
+          codesign -dv --verbose=4 ./build/macos/Build/Products/Release/*.app
 
       - name: Upload macOS
         uses: actions/upload-artifact@v3
@@ -277,8 +275,8 @@ jobs:
           name: macos-result
           path: macos-result
 
-      - name: Rename macos
-        run: mv macos-result/*.app macos-result/${{ env.APP_NAME }}-${{ env.VERSION }}-macos.app
+      - name: Rename& zip macos
+        run: zip -r macos-result/${{ env.APP_NAME }}-${{ env.VERSION }}-macos.zip macos-result/*.app
 
       # APK
       - name: Download apk file
@@ -299,7 +297,7 @@ jobs:
       - name: Push to Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "windows-zip-result/*.zip, apk-result/*.apk, ipa-result/*.ipa, macos-result/*.app"
+          artifacts: "windows-zip-result/*.zip, apk-result/*.apk, ipa-result/*.ipa, macos-result/*.zip"
           token: ${{ secrets.WORKFLOW_TOKEN }}
           tag: v${{ env.VERSION }}
           name: v${{ env.VERSION }}
