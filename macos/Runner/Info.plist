@@ -39,5 +39,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSApplicationCrashOnExceptions</key>
+	<true></true>
 </dict>
 </plist>
