@@ -97,7 +97,7 @@ jobs:
 
       - name: Build iOS
         run: |
-          flutter build ios --release
+          flutter build ipa --release
           cd build/ios/iphoneos
           mkdir Payload
           cd Payload
@@ -123,17 +123,18 @@ jobs:
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          MAC_BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.MAC_BUILD_PROVISION_PROFILE_BASE64 }}
+#          MAC_BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.MAC_BUILD_PROVISION_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          IDENTITY: "Apple Distribution: Wuhan Shuchen Technology Co., Ltd. (8N7W8ZCSHP)"
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH=$RUNNER_TEMP/build_pp.provisionprofile
+#          PP_PATH=$RUNNER_TEMP/build_pp.provisionprofile
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-          echo -n "$MAC_BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+#          echo -n "$MAC_BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
 
           # create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -146,8 +147,8 @@ jobs:
           security list-keychain -d user -s $KEYCHAIN_PATH
 
           # apply provisioning profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+#          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+#          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Download generated files
         uses: actions/download-artifact@v3
@@ -165,6 +166,9 @@ jobs:
 
       - name: Build macOS
         run: flutter build macos --release
+
+      - name: Sign macOS
+        run: /usr/bin/codesign --force --deep -s ${{ env.IDENTITY }} ./build/macos/Build/Products/Release/*.app
 
       - name: Upload macOS
         uses: actions/upload-artifact@v3
