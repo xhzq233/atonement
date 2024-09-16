@@ -14,6 +14,7 @@ import 'package:atonement/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:framework/widgets.dart';
 import 'package:get/state_manager.dart';
 import 'account.dart';
 import 'firebase_options.dart';
@@ -113,12 +114,11 @@ class _Home extends StatelessWidget {
             ),
             backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
             leading: Builder(
-                builder: (context) => CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      // open drawer
-                      onPressed: () => Scaffold.of(context).openDrawer(),
-                      child: const Icon(CupertinoIcons.person_crop_circle),
-                    )),
+              builder: (context) => CustomCupertinoButton(
+                onTap: Scaffold.of(context).openDrawer,
+                child: NNImage(currentUser.value.photoUrl),
+              ),
+            ),
           ),
           SliverFillRemaining(
             child: ProviderWidget.owned(
