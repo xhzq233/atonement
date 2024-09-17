@@ -7,11 +7,11 @@
 	<key>manageAppVersionAndBuildNumber</key>
 	<true/>
 	<key>method</key>
-	<string>app-store-connect</string>
+	<string>release-testing</string>
 	<key>provisioningProfiles</key>
 	<dict>
 		<key>xyz.xhzq.atonement-app</key>
-		<string>GithubAction</string>
+		<string>Distribution Ad Hoc</string>
 	</dict>
 	<key>signingCertificate</key>
 	<string>Apple Distribution: Wuhan Shuchen Technology Co., Ltd. (8N7W8ZCSHP)</string>
