@@ -41,10 +41,12 @@ class _CatcherDelegate with Catcher {
 
   @override
   void main() async {
-    runApp(const MyApp());
+    runApp(const _MyApp());
 
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     await initLog();
+    SmartDialog.config.toast = SmartConfigToast(displayTime: const Duration(milliseconds: 2500));
+
     initMessaging();
     initAccount();
   }
@@ -58,13 +60,11 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 NavigatorState get rootNavigator => navigatorKey.currentState!;
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class _MyApp extends StatelessWidget {
+  const _MyApp();
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    SmartDialog.config.toast = SmartConfigToast(displayTime: const Duration(milliseconds: 2500));
     if (kIsWeb) {
       final brightness = MediaQuery.platformBrightnessOf(context);
       changePWABarColorTo(brightness == Brightness.dark ? darkThemeData.primaryColor : lightThemeData.primaryColor);
@@ -116,7 +116,7 @@ class _Home extends StatelessWidget {
             leading: Builder(
               builder: (context) => CustomCupertinoButton(
                 onTap: Scaffold.of(context).openDrawer,
-                child: NNImage(currentUser.value.photoUrl),
+                child: Obx(() => NNImage(currentUser.value.photoUrl)),
               ),
             ),
           ),
