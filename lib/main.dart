@@ -30,20 +30,22 @@ part 'main_body.dart';
 class _CatcherDelegate with Catcher {
   @override
   void handleException(String name, String reason, StackTrace stackTrace) {
-    FirebaseCrashlytics.instance.recordError(name, stackTrace, reason: reason, printDetails: true);
+    FirebaseCrashlytics.instance.recordError(reason, stackTrace, reason: name, printDetails: true);
   }
 
   @override
   void handleFlutterError(FlutterErrorDetails errorDetails) {
     FlutterError.presentError(errorDetails);
-    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
   }
 
   @override
   void main() async {
-    runApp(const _MyApp());
+    WidgetsFlutterBinding.ensureInitialized();
 
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    runApp(const _MyApp());
+
     await initLog();
     SmartDialog.config.toast = SmartConfigToast(displayTime: const Duration(milliseconds: 2500));
 
