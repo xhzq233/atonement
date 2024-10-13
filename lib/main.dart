@@ -14,11 +14,11 @@ import 'package:atonement/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:framework/route.dart';
 import 'package:framework/widgets.dart';
 import 'package:get/state_manager.dart';
 import 'account.dart';
 import 'firebase_options.dart';
-import 'image.dart';
 import 'platform/sign_in_button.dart';
 import 'messaging.dart';
 import 'package:framework/base.dart';
@@ -58,10 +58,6 @@ void main() async {
   Catcher.init(delegate: _CatcherDelegate());
 }
 
-final navigatorKey = GlobalKey<NavigatorState>();
-
-NavigatorState get rootNavigator => navigatorKey.currentState!;
-
 class _MyApp extends StatelessWidget {
   const _MyApp();
 
@@ -82,7 +78,7 @@ class _MyApp extends StatelessWidget {
         '/todos': (context) => const _Todos(),
       },
       builder: FlutterSmartDialog.init(),
-      navigatorKey: navigatorKey,
+      navigatorKey: rootNavigatorKey,
       initialRoute: '/',
     );
   }

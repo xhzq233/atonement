@@ -7,7 +7,6 @@ import 'package:framework/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'log.dart';
-import 'main.dart';
 
 class WrapImage extends StatelessWidget {
   const WrapImage({super.key, required this.imageUrl});
@@ -49,33 +48,6 @@ class WrapImage extends StatelessWidget {
             ),
           ],
           child: Hero(tag: imageUrl, child: child),
-        ),
-      ),
-    );
-  }
-}
-
-class NNAvatar extends StatelessWidget {
-  const NNAvatar({super.key, required this.imageUrl, this.size = 32});
-
-  final String imageUrl;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final scaledSize = MediaQuery.textScalerOf(context).scale(size);
-    final tag = hashCode;
-    final child = NNImage(imageUrl, fit: BoxFit.contain);
-    return CustomCupertinoButton(
-      onTap: () => rootNavigator.push(PhotoPageRoute(draggableChild: child, heroTag: tag)),
-      child: SizedBox(
-        width: scaledSize,
-        height: scaledSize,
-        child: FittedBox(
-          child: Hero(
-            tag: tag,
-            child: ClipOval(child: child),
-          ),
         ),
       ),
     );

@@ -5,13 +5,13 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:framework/route.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'account.dart';
 import 'log.dart';
-import 'main.dart';
 
 final CollectionReference<Map<String, dynamic>> _messageDb = FirebaseFirestore.instance.collection('messages');
 
