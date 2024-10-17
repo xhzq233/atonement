@@ -3,4 +3,4 @@
 
 PROVISIONING_PROFILE_SPECIFIER=Mac Profile
 DEVELOPMENT_TEAM=8N7W8ZCSHP
-CODE_SIGN_IDENTITY="Apple Distribution: Wuhan Shuchen Technology Co., Ltd. (8N7W8ZCSHP)"
+CODE_SIGN_IDENTITY=Apple Distribution: Wuhan Shuchen Technology Co., Ltd. (8N7W8ZCSHP)
