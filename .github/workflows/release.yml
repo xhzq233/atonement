@@ -9,6 +9,7 @@ env:
   APP_NAME: "Atonement"
   BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
   P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+  P12_PASSWORD_MAC: ${{ secrets.P12_PASSWORD_MAC }}
   BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
   BUILD_PROVISION_PROFILE_BASE64_MAC: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64_MAC }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
@@ -97,12 +98,7 @@ jobs:
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
 
       - name: Build iOS
-        env:
-          FLUTTER_XCODE_PROVISIONING_PROFILE_SPECIFIER: "Distribution Ad Hoc"
-          FLUTTER_XCODE_CODE_SIGN_IDENTITY: "Apple Distribution: Wuhan Shuchen Technology Co., Ltd. (8N7W8ZCSHP)"
-
-        run: |
-          flutter build ipa --export-options-plist=exportOptions.plist
+        run: flutter build ipa --release
 
       - name: Upload IPA
         uses: actions/upload-artifact@v3
@@ -134,7 +130,7 @@ jobs:
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
           # import certificate to keychain
-          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security import $CERTIFICATE_PATH -P "P12_PASSWORD_MAC" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
           
@@ -159,14 +155,6 @@ jobs:
 
       - name: Build macOS
         run: flutter build macos --release --no-track-widget-creation
-
-      - name: Sign macOS
-        run: |
-          # Before signing
-          codesign -dv --verbose=4 ./build/macos/Build/Products/Release/*.app
-          codesign --force --deep -s 'Apple Development: Zhen Xiahou (YV49UU65FT)' ./build/macos/Build/Products/Release/*.app
-          # After signing
-          codesign -dv --verbose=4 ./build/macos/Build/Products/Release/*.app
 
       - name: Zip macOS
         run: zip -r build/macos/Build/Products/Release/macos.zip build/macos/Build/Products/Release/*.app
