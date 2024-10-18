@@ -101,7 +101,9 @@ jobs:
         run: flutter build ipa --release
 
       - name: Zip iOS
-        run: zip -r build/ios/archive/Runner.xcarchive.zip build/ios/archive/Runner.xcarchive
+        run: |
+          cd build/ios/archive
+          zip -r Runner.xcarchive.zip Runner.xcarchive
 
       - name: Upload IPA
         uses: actions/upload-artifact@v3
@@ -160,13 +162,15 @@ jobs:
         run: flutter build macos --release --no-track-widget-creation
 
       - name: Zip macOS
-        run: zip -r build/macos/Build/Products/Release/macos.zip build/macos/Build/Products/Release/*.app
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r macos.zip *.app
 
       - name: Upload macOS
         uses: actions/upload-artifact@v3
         with:
           name: macos-result
-          path: build/macos/Build/Products/Release/*.zip
+          path: build/macos/Build/Products/Release/macos.zip
 
   build_apk:
     needs: build
@@ -217,7 +221,7 @@ jobs:
           name: apk-result
           path: build/app/outputs/flutter-apk/*.apk
 
-  build_windows_zip:
+  build_windows:
     needs: build
     runs-on: windows-latest
 
@@ -246,11 +250,11 @@ jobs:
       - name: Upload zip
         uses: actions/upload-artifact@v3
         with:
-          name: windows-zip-result
+          name: windows-result
           path: App.zip
 
   release:
-    needs: [ build, build_apk, build_windows_zip, build_ipa, build_macos ]
+    needs: [ build, build_apk, build_windows, build_ipa, build_macos ]
     runs-on: ubuntu-20.04
     env:
       VERSION: ${{ needs.build.outputs.version }}
@@ -265,8 +269,8 @@ jobs:
           name: Runner.xcarchive.zip
           path: ios-result
 
-      - name: Rename and unzip ios
-        run: unzip ios-result/Runner.xcarchive.zip -d ios-result/${{ env.APP_NAME }}-${{ env.VERSION }}.xcarchive
+      - name: Rename ios
+        run: mv ios-result/Runner.xcarchive.zip ios-result/${{ env.APP_NAME }}-${{ env.VERSION }}.xcarchive.zip
 
       # MACOS
       - name: Download macos
@@ -289,15 +293,15 @@ jobs:
       - name: Download windows zip file
         uses: actions/download-artifact@v3
         with:
-          name: windows-zip-result
-          path: windows-zip-result
+          name: windows-result
+          path: windows-result
       - name: Rename windows
-        run: mv windows-zip-result/*.zip windows-zip-result/${{ env.APP_NAME }}-${{ env.VERSION }}-windows-x64.zip
+        run: mv windows-result/*.zip windows-result/${{ env.APP_NAME }}-${{ env.VERSION }}-windows-x64.zip
 
       - name: Push to Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "windows-zip-result/*.zip, apk-result/*.apk, ios-result/*.xcarchive, macos-result/*.zip"
+          artifacts: "windows-result/*.zip, apk-result/*.apk, ios-result/*.xcarchive.zip, macos-result/*.zip"
           token: ${{ secrets.WORKFLOW_TOKEN }}
           tag: v${{ env.VERSION }}
           name: v${{ env.VERSION }}
