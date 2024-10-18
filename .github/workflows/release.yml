@@ -100,11 +100,14 @@ jobs:
       - name: Build iOS
         run: flutter build ipa --release
 
+      - name: Zip iOS
+        run: zip -r build/ios/archive/Runner.xcarchive.zip build/ios/archive/Runner.xcarchive
+
       - name: Upload IPA
         uses: actions/upload-artifact@v3
         with:
-          name: ipa-result
-          path: build/ios/ipa/*.ipa
+          name: Runner.xcarchive.zip
+          path: build/ios/archive/Runner.xcarchive.zip
 
   build_macos:
     needs: build
@@ -256,14 +259,14 @@ jobs:
       - uses: actions/checkout@v3
 
       # IPA
-      - name: Download ipa
+      - name: Download ios
         uses: actions/download-artifact@v3
         with:
-          name: ipa-result
-          path: ipa-result
+          name: Runner.xcarchive.zip
+          path: ios-result
 
-      - name: Rename ipa
-        run: mv ipa-result/*.ipa ipa-result/${{ env.APP_NAME }}-${{ env.VERSION }}.ipa
+      - name: Rename and unzip ios
+        run: unzip ios-result/Runner.xcarchive.zip -d ios-result/${{ env.APP_NAME }}-${{ env.VERSION }}.xcarchive
 
       # MACOS
       - name: Download macos
@@ -294,7 +297,7 @@ jobs:
       - name: Push to Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "windows-zip-result/*.zip, apk-result/*.apk, ipa-result/*.ipa, macos-result/*.zip"
+          artifacts: "windows-zip-result/*.zip, apk-result/*.apk, ios-result/*.xcarchive, macos-result/*.zip"
           token: ${{ secrets.WORKFLOW_TOKEN }}
           tag: v${{ env.VERSION }}
           name: v${{ env.VERSION }}
