@@ -36,55 +36,6 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_lints: ^4.0.0
   build_runner: ^2.4.6
-  flutter_flavorizr: ^2.2.3
 
 flutter:
   uses-material-design: true
-
-flavorizr:
-  flavors:
-    dev:
-      app:
-        name: "Atonement Dev"
-
-      android:
-        applicationId: "xyz.xhzq.atonement-app"
-      ios:
-        bundleId: "xyz.xhzq.atonement-app"
-      macos:
-        bundleId: "xyz.xhzq.atonement-app"
-    release:
-      app:
-        name: "Atonement"
-
-      android:
-        applicationId: "xyz.xhzq.atonement-app"
-      ios:
-        bundleId: "xyz.xhzq.atonement-app"
-        buildSettings:
-          PROVISIONING_PROFILE_SPECIFIER: "iOS Dev"
-          DEVELOPMENT_TEAM: "8N7W8ZCSHP"
-          CODE_SIGN_IDENTITY: "Apple Development: Zhen Xiahou (YV49UU65FT)"
-      macos:
-        bundleId: "xyz.xhzq.atonement-app"
-        buildSettings:
-          PROVISIONING_PROFILE_SPECIFIER: "Mac Profile"
-          DEVELOPMENT_TEAM: "8N7W8ZCSHP"
-          CODE_SIGN_IDENTITY: "Apple Distribution: Wuhan Shuchen Technology Co., Ltd. (8N7W8ZCSHP)"
-
-  instructions:
-    - assets:download
-    - assets:extract
-    - android:androidManifest
-    - android:buildGradle
-#    - android:dummyAssets
-#    - android:icons
-    - ios:podfile
-    - ios:xcconfig
-    - ios:buildTargets
-    - ios:schema
-#    - ios:dummyAssets
-#    - ios:icons
-    - ios:plist
-    - assets:clean
-    - ide:config
