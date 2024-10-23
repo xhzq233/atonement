@@ -5,6 +5,7 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:framework/platform.dart';
 import 'package:framework/route.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'dart:convert';
@@ -299,10 +300,10 @@ Future<void> _pushToken(String token) async {
       },
       body: jsonEncode(<String, dynamic>{
         'token': token,
-        'name': '$displayName@$device',
+        'name': '$displayName@$deviceName',
       }),
     );
-    fireLogI('Token pushed: $token, $displayName@$device');
+    fireLogI('Token pushed: $token, $displayName@$deviceName');
   } catch (e) {
     fireLogE(e.toString());
     SmartDialog.showToast(e.toString());

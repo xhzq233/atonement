@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:atonement/bubble.dart';
 import 'package:atonement/pick_image.dart';
-import 'package:atonement/log.dart';
-import 'package:atonement/platform/change_pwa_bar_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +12,7 @@ import 'package:atonement/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:framework/platform.dart';
 import 'package:framework/route.dart';
 import 'package:framework/widgets.dart';
 import 'package:get/state_manager.dart';
@@ -46,7 +45,6 @@ class _CatcherDelegate with Catcher {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     runApp(const _MyApp());
 
-    await initLog();
     SmartDialog.config.toast = SmartConfigToast(displayTime: const Duration(milliseconds: 2500));
 
     initMessaging();
